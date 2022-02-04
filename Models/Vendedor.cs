@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace projeto_dotnet_sql
+namespace projeto_dotnet_sql.Models
 {
     public class Vendedor
     {
@@ -14,5 +14,11 @@ namespace projeto_dotnet_sql
         public double SalarioMinimo { get; set; }
 
         public Vendedor() { }
+
+        public Vendedor(string nome, double salarioMinimo)
+        {
+            Nome = nome;
+            SalarioMinimo = salarioMinimo;
+        }
     }
 }

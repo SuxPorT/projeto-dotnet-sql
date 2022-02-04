@@ -1,4 +1,5 @@
 using projeto_dotnet_sql.Models;
+using projeto_dotnet_sql.Models.Form;
 
 namespace projeto_dotnet_sql.DAL
 {
@@ -12,9 +13,41 @@ namespace projeto_dotnet_sql.DAL
             this.context = context;
         }
 
-        public IEnumerable<Veiculos> GetVeiculos()
+        public IEnumerable<Veiculo> GetVeiculos()
         {
             return this.context.Veiculos!.ToList();
+        }
+
+        public Veiculo GetVeiculoPorNumeroChassi(string numeroChassi)
+        {
+            return this.context.Veiculos!.Find(numeroChassi)!;
+        }
+
+        public void InsertVeiculo(Veiculo veiculo)
+        {
+            this.context.Veiculos!.Add(veiculo);
+            this.Save();
+        }
+
+        public Veiculo GetUltimoVeiculo()
+        {
+            return this.context.Veiculos!.OrderBy(e => e.NumeroChassi)
+                                         .Last<Veiculo>();
+        }
+
+        public void UpdateVeiculo(Veiculo veiculo, VeiculoForm veiculoAtualizado)
+        {
+            this.context.Entry(veiculo).CurrentValues
+                        .SetValues(veiculoAtualizado);
+            this.Save();
+        }
+
+        public void DeleteVeiculo(string numeroChassi)
+        {
+            var veiculo = this.context.Veiculos!.Find(numeroChassi);
+
+            context.Veiculos.Remove(veiculo!);
+            this.Save();
         }
 
         public void Save()

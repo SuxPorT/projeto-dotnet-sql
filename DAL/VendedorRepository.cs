@@ -1,4 +1,5 @@
 using projeto_dotnet_sql.Models;
+using projeto_dotnet_sql.Models.Form;
 
 namespace projeto_dotnet_sql.DAL
 {
@@ -15,6 +16,38 @@ namespace projeto_dotnet_sql.DAL
         public IEnumerable<Vendedor> GetVendedores()
         {
             return this.context.Vendedores!.ToList();
+        }
+
+        public Vendedor GetVendedorPorID(int vendedorId)
+        {
+            return this.context.Vendedores!.Find(vendedorId)!;
+        }
+
+        public void InsertVendedor(Vendedor vendedor)
+        {
+            this.context.Vendedores!.Add(vendedor);
+            this.Save();
+        }
+
+        public Vendedor GetUltimoVendedor()
+        {
+            return this.context.Vendedores!.OrderBy(e => e.VendedorId)
+                .Last<Vendedor>();
+        }
+
+        public void UpdateVendedor(Vendedor vendedor, VendedorForm vendedorAtualizado)
+        {
+            this.context.Entry(vendedor).CurrentValues
+                        .SetValues(vendedorAtualizado);
+            this.Save();
+        }
+
+        public void DeleteVendedor(int vendedorId)
+        {
+            var vendedor = this.context.Vendedores!.Find(vendedorId);
+
+            context.Vendedores.Remove(vendedor!);
+            this.Save();
         }
 
         public void Save()

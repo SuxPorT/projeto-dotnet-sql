@@ -5,7 +5,7 @@ namespace projeto_dotnet_sql.Models
     public class ConcessionariaContext : DbContext
     {
         public DbSet<Vendedor>? Vendedores { get; set; } = null;
-        public DbSet<Veiculos>? Veiculos { get; set; } = null;
+        public DbSet<Veiculo>? Veiculos { get; set; } = null;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

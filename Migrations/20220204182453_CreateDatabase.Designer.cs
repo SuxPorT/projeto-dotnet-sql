@@ -11,8 +11,8 @@ using projeto_dotnet_sql.Models;
 namespace projeto_dotnet_sql.Migrations
 {
     [DbContext(typeof(ConcessionariaContext))]
-    [Migration("20220203194112_TestMigration")]
-    partial class TestMigration
+    [Migration("20220204182453_CreateDatabase")]
+    partial class CreateDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,7 +23,43 @@ namespace projeto_dotnet_sql.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("projeto_dotnet_sql.Vendedor", b =>
+            modelBuilder.Entity("projeto_dotnet_sql.Models.Veiculo", b =>
+                {
+                    b.Property<string>("NumeroChassi")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Ano")
+                        .HasMaxLength(30)
+                        .HasColumnType("int");
+
+                    b.Property<string>("Cor")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Modelo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("ProprietarioId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Quilometragem")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Valor")
+                        .HasColumnType("float");
+
+                    b.Property<string>("VersaoSistema")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.HasKey("NumeroChassi");
+
+                    b.ToTable("Veiculos");
+                });
+
+            modelBuilder.Entity("projeto_dotnet_sql.Models.Vendedor", b =>
                 {
                     b.Property<int>("VendedorId")
                         .ValueGeneratedOnAdd()

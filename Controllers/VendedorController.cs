@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using projeto_dotnet_sql.DAL;
 using projeto_dotnet_sql.Models;
+using projeto_dotnet_sql.Models.Form;
 
 namespace projeto_dotnet_sql.Controllers
 {
@@ -15,70 +16,75 @@ namespace projeto_dotnet_sql.Controllers
             this.vendedorRepository = new VendedorRepository(new ConcessionariaContext());
         }
 
-
-
         [HttpGet]
         public IEnumerable<Vendedor> GetVendedores()
         {
             return this.vendedorRepository!.GetVendedores();
         }
 
-         [HttpPost]
-        public Vendedor? Post([FromBody] Vendedor vendedor)
-        {
-            using (var _context = new ConcessionariaContext())
-            {
-                _context.Vendedores.Add(vendedor);
-                _context.SaveChanges();
-                return vendedor;//_context.Students.Find(student.StudentId);
-            }
-        }
-
-         [HttpPut("{id}")]
-        public void Put(int id,[FromBody] Vendedor vendedor)
-        {
-            using(var _context = new ConcessionariaContext())
-            {
-                var entity = _context.Vendedores.Find(id);
-                if(entity == null)
-                {
-                    return ;
-                }
-                _context.Entry(entity).CurrentValues.SetValues(vendedor);
-                _context.SaveChanges();
-            }
-        }
-
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public IActionResult GetVendedorPorID(int id)
         {
-            using(var _context = new ConcessionariaContext())
+            var vendedor = this.vendedorRepository!.GetVendedorPorID(id);
+
+            if (vendedor is null)
             {
-                var vendedor = _context.Vendedores
-                                .FirstOrDefault(s => s.VendedorId == id);
-                if(vendedor == null)
-                {
-                    return NotFound();
-                }
-                return Ok(vendedor);
+                return NotFound($"Vendedor com o id \"{id}\" não foi encontrado");
             }
+
+            return Ok(vendedor);
+        }
+
+        [HttpPost]
+        public IActionResult PostVendedor([FromBody] VendedorForm vendedorForm)
+        {
+            if (vendedorForm is null)
+            {
+                return BadRequest();
+            }
+
+            this.vendedorRepository!.InsertVendedor(vendedorForm.ToVendedor());
+
+            var vendedor = this.vendedorRepository.GetUltimoVendedor();
+
+            return Ok(vendedor);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateVendedor(int id, [FromBody] VendedorForm vendedorForm)
+        {
+            if (vendedorForm is null)
+            {
+                return BadRequest();
+            }
+
+            var entity = this.vendedorRepository!.GetVendedorPorID(id);
+
+            if (entity is null)
+            {
+                return NotFound($"Vendedor com o id \"{id}\" não foi encontrado");
+            }
+
+            this.vendedorRepository.UpdateVendedor(entity, vendedorForm);
+
+            entity = this.vendedorRepository.GetVendedorPorID(id);
+
+            return Ok(entity);
         }
 
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult DeleteVendedor(int id)
         {
-            using(var _context = new ConcessionariaContext())
+            var vendedor = this.vendedorRepository!.GetVendedorPorID(id);
+
+            if (vendedor is null)
             {
-                var entity = _context.Vendedores.Find(id);
-                if(entity == null)
-                {
-                    return ;
-                }
-                _context.Vendedores.Remove(entity);
-                _context.SaveChanges();
+                return NotFound($"Vendedor com o id \"{id}\" não foi encontrado");
             }
+
+            this.vendedorRepository.DeleteVendedor(id);
+
+            return Ok();
         }
-
-
     }
 }

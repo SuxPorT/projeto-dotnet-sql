@@ -1,84 +1,92 @@
 using Microsoft.AspNetCore.Mvc;
 using projeto_dotnet_sql.DAL;
 using projeto_dotnet_sql.Models;
+using projeto_dotnet_sql.Models.Form;
 
 namespace projeto_dotnet_sql.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class VeiculosController : ControllerBase
+    public class VeiculoController : ControllerBase
     {
         private IVeiculoRepository? veiculoRepository;
 
-        public VeiculosController()
+        public VeiculoController()
         {
             this.veiculoRepository = new VeiculoRepository(new ConcessionariaContext());
         }
 
-
-
         [HttpGet]
-        public IEnumerable<Veiculos> GetVeiculos()
+        public IEnumerable<Veiculo> GetVeiculos()
         {
             return this.veiculoRepository!.GetVeiculos();
         }
 
-         [HttpPost]
-        public Veiculos? Post([FromBody] Veiculos veiculo)
+        [HttpGet("{numeroChassi}")]
+        public IActionResult GetVendedorPorNumeroChassi(string numeroChassi)
         {
-            using (var _context = new ConcessionariaContext())
+            var veiculo = this.veiculoRepository!.GetVeiculoPorNumeroChassi(numeroChassi);
+
+            if (veiculo is null)
             {
-                _context.Veiculos.Add(veiculo);
-                _context.SaveChanges();
-                return veiculo;//_context.Students.Find(student.StudentId);
+                return NotFound($"Veículo com o chassi \"{numeroChassi}\" não foi encontrado");
             }
+
+            return Ok(veiculo);
         }
 
-         [HttpPut("{id}")]
-        public void Put(string id,[FromBody] Veiculos veiculo)
+        [HttpPost]
+        public IActionResult PostVeiculo([FromBody] VeiculoForm veiculoForm)
         {
-            using(var _context = new ConcessionariaContext())
+            if (veiculoForm is null)
             {
-                var entity = _context.Veiculos.Find(id);
-                if(entity == null)
-                {
-                    return ;
-                }
-                _context.Entry(entity).CurrentValues.SetValues(veiculo);
-                _context.SaveChanges();
+                return BadRequest();
             }
+
+            this.veiculoRepository!.InsertVeiculo(veiculoForm.ToVeiculo());
+
+            // Não necessariamente irá pegar o veículo criado 
+            // (já que ordena pelo chassi)
+            var veiculo = this.veiculoRepository.GetUltimoVeiculo();
+
+            return Ok(veiculo);
         }
 
-        [HttpGet("{id}")]
-        public IActionResult Get(string id)
+        [HttpPut("{numeroChassi}")]
+        public IActionResult UpdateVendedor(string numeroChassi, [FromBody] VeiculoForm veiculoForm)
         {
-            using(var _context = new ConcessionariaContext())
+            if (veiculoForm is null)
             {
-                var veiculo = _context.Veiculos
-                                .FirstOrDefault(s => s.NumeroChassi == id);
-                if(veiculo == null)
-                {
-                    return NotFound();
-                }
-                return Ok(veiculo);
+                return BadRequest();
             }
+
+            var entity = this.veiculoRepository!.GetVeiculoPorNumeroChassi(numeroChassi);
+
+            if (entity is null)
+            {
+                return NotFound($"Veículo com o chassi \"{numeroChassi}\" não foi encontrado");
+            }
+
+            this.veiculoRepository.UpdateVeiculo(entity, veiculoForm);
+
+            entity = this.veiculoRepository.GetVeiculoPorNumeroChassi(numeroChassi);
+
+            return Ok(entity);
         }
 
-        [HttpDelete("{id}")]
-        public void Delete(string id)
+        [HttpDelete("{numeroChassi}")]
+        public IActionResult DeleteVendedor(string numeroChassi)
         {
-            using(var _context = new ConcessionariaContext())
+            var vendedor = this.veiculoRepository!.GetVeiculoPorNumeroChassi(numeroChassi);
+
+            if (vendedor is null)
             {
-                var entity = _context.Veiculos.Find(id);
-                if(entity == null)
-                {
-                    return ;
-                }
-                _context.Veiculos.Remove(entity);
-                _context.SaveChanges();
+                return NotFound($"Veículo com o chassi \"{numeroChassi}\" não foi encontrado");
             }
+
+            this.veiculoRepository.DeleteVeiculo(numeroChassi);
+
+            return Ok();
         }
-
-
     }
 }
