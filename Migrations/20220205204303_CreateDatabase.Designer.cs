@@ -12,7 +12,7 @@ using projeto_dotnet_sql.Models;
 namespace projeto_dotnet_sql.Migrations
 {
     [DbContext(typeof(ConcessionariaContext))]
-    [Migration("20220205141646_CreateDatabase")]
+    [Migration("20220205204303_CreateDatabase")]
     partial class CreateDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -60,9 +60,6 @@ namespace projeto_dotnet_sql.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Estado")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("IndicadorPessoa")
                         .IsRequired()
                         .HasMaxLength(1)
@@ -72,8 +69,8 @@ namespace projeto_dotnet_sql.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("TelefoneId")
-                        .HasColumnType("int");
+                    b.Property<string>("UF")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CpfCnpj");
 
@@ -93,7 +90,12 @@ namespace projeto_dotnet_sql.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<string>("ProprietarioCpfCnpj")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("TelefoneId");
+
+                    b.HasIndex("ProprietarioCpfCnpj");
 
                     b.ToTable("Telefones");
                 });
@@ -117,7 +119,7 @@ namespace projeto_dotnet_sql.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ProprietarioCpfCnpj")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Quilometragem")
                         .HasColumnType("float");
@@ -130,8 +132,6 @@ namespace projeto_dotnet_sql.Migrations
                         .HasColumnType("nvarchar(10)");
 
                     b.HasKey("NumeroChassi");
-
-                    b.HasIndex("ProprietarioCpfCnpj");
 
                     b.ToTable("Veiculos");
                 });
@@ -187,13 +187,11 @@ namespace projeto_dotnet_sql.Migrations
                     b.ToTable("Vendedores");
                 });
 
-            modelBuilder.Entity("projeto_dotnet_sql.Models.Veiculo", b =>
+            modelBuilder.Entity("projeto_dotnet_sql.Models.Telefone", b =>
                 {
-                    b.HasOne("projeto_dotnet_sql.Models.Proprietario", "Proprietario")
-                        .WithMany()
+                    b.HasOne("projeto_dotnet_sql.Models.Proprietario", null)
+                        .WithMany("Telefones")
                         .HasForeignKey("ProprietarioCpfCnpj");
-
-                    b.Navigation("Proprietario");
                 });
 
             modelBuilder.Entity("projeto_dotnet_sql.Models.Venda", b =>
@@ -205,7 +203,7 @@ namespace projeto_dotnet_sql.Migrations
                         .IsRequired();
 
                     b.HasOne("projeto_dotnet_sql.Models.Vendedor", "Vendedor")
-                        .WithMany("Vendas")
+                        .WithMany()
                         .HasForeignKey("VendedorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -215,9 +213,9 @@ namespace projeto_dotnet_sql.Migrations
                     b.Navigation("Vendedor");
                 });
 
-            modelBuilder.Entity("projeto_dotnet_sql.Models.Vendedor", b =>
+            modelBuilder.Entity("projeto_dotnet_sql.Models.Proprietario", b =>
                 {
-                    b.Navigation("Vendas");
+                    b.Navigation("Telefones");
                 });
 #pragma warning restore 612, 618
         }

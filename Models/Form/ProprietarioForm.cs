@@ -1,13 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using projeto_dotnet_sql.Models;
 
-namespace projeto_dotnet_sql.Models
+namespace projeto_dotnet_sql.Controllers.DTO
 {
-    public class Proprietario
+    public class ProprietarioForm
     {
-        [Key]
-        public string? CpfCnpj { get; set; }
-
         [MaxLength(1, ErrorMessage = "O campo deve indicar \"F\" ou \"J")]
         public char IndicadorPessoa { get; set; }
 
@@ -24,6 +21,21 @@ namespace projeto_dotnet_sql.Models
         public string? UF { get; set; }
         public string? CEP { get; set; }
 
-        public Proprietario() { }
+        public ProprietarioForm() { }
+
+        public Proprietario ToProprietario()
+        {
+            return new Proprietario
+            {
+                IndicadorPessoa = this.IndicadorPessoa,
+                Nome = this.Nome,
+                Email = this.Email,
+                Telefones = this.Telefones,
+                DataNascimento = this.DataNascimento,
+                Cidade = this.Cidade,
+                UF = this.UF,
+                CEP = this.CEP
+            };
+        }
     }
 }

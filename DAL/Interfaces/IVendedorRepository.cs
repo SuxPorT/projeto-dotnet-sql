@@ -1,7 +1,7 @@
 using projeto_dotnet_sql.Models;
 using projeto_dotnet_sql.Models.Form;
 
-namespace projeto_dotnet_sql.DAL
+namespace projeto_dotnet_sql.DAL.Interfaces
 {
     public interface IVendedorRepository : IDisposable
     {

@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace projeto_dotnet_sql.Models
+namespace projeto_dotnet_sql.Models.DTO
 {
-    public class Proprietario
+    public class ProprietarioDTO
     {
         [Key]
         public string? CpfCnpj { get; set; }
@@ -23,7 +22,6 @@ namespace projeto_dotnet_sql.Models
         public string? Cidade { get; set; }
         public string? UF { get; set; }
         public string? CEP { get; set; }
-
-        public Proprietario() { }
+        public ProprietarioDTO() { }
     }
 }

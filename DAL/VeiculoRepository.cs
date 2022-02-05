@@ -1,3 +1,4 @@
+using projeto_dotnet_sql.DAL.Interfaces;
 using projeto_dotnet_sql.Models;
 using projeto_dotnet_sql.Models.Form;
 
@@ -23,16 +24,16 @@ namespace projeto_dotnet_sql.DAL
             return this.context.Veiculos!.Find(numeroChassi)!;
         }
 
-        public void InsertVeiculo(Veiculo veiculo)
-        {
-            this.context.Veiculos!.Add(veiculo);
-            this.Save();
-        }
-
         public Veiculo GetUltimoVeiculo()
         {
             return this.context.Veiculos!.OrderBy(e => e.NumeroChassi)
                                          .Last<Veiculo>();
+        }
+
+        public void InsertVeiculo(Veiculo veiculo)
+        {
+            this.context.Veiculos!.Add(veiculo);
+            this.Save();
         }
 
         public void UpdateVeiculo(Veiculo veiculo, VeiculoForm veiculoAtualizado)

@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace projeto_dotnet_sql.Models
+namespace projeto_dotnet_sql.Models.DTO
 {
-    public class Vendedor
+    public class VendedorDTO
     {
         [Key]
         public int VendedorId { get; set; }
@@ -13,7 +13,8 @@ namespace projeto_dotnet_sql.Models
 
         [Range(1200, 6000, ErrorMessage = "O salário mínimo deve estar entre R$1200,00 e R$6000,00")]
         public double SalarioMinimo { get; set; }
+        public ICollection<Venda> Vendas { get; set; } = new List<Venda>();
 
-        public Vendedor() { }
+        public VendedorDTO() { }
     }
 }

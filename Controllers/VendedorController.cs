@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using projeto_dotnet_sql.DAL;
+using projeto_dotnet_sql.DAL.Interfaces;
 using projeto_dotnet_sql.Models;
+using projeto_dotnet_sql.Models.DTO;
 using projeto_dotnet_sql.Models.Form;
 
 namespace projeto_dotnet_sql.Controllers
@@ -10,16 +12,35 @@ namespace projeto_dotnet_sql.Controllers
     public class VendedorController : ControllerBase
     {
         private IVendedorRepository? vendedorRepository;
+        private IVendaRepository? vendaRepository;
 
         public VendedorController()
         {
             this.vendedorRepository = new VendedorRepository(new ConcessionariaContext());
+            this.vendaRepository = new VendaRepository(new ConcessionariaContext());
         }
 
         [HttpGet]
-        public IEnumerable<Vendedor> GetVendedores()
+        public IEnumerable<VendedorDTO> GetVendedores()
         {
-            return this.vendedorRepository!.GetVendedores();
+            var vendedores = this.vendedorRepository!.GetVendedores();
+            var vendas = this.vendaRepository!.GetVendas();
+
+            var vendedorDTO = vendedores.Join(
+                vendas,
+                vendedor => vendedor.VendedorId,
+                venda => venda.VendedorId,
+
+                (vendedor, venda) => new VendedorDTO
+                {
+                    VendedorId = vendedor.VendedorId,
+                    Nome = vendedor.Nome,
+                    SalarioMinimo = vendedor.SalarioMinimo,
+                    Vendas = new List<Venda> { venda }
+                }
+            );
+
+            return vendedorDTO;
         }
 
         [HttpGet("{id}")]
@@ -36,14 +57,14 @@ namespace projeto_dotnet_sql.Controllers
         }
 
         [HttpPost]
-        public IActionResult PostVendedor([FromBody] VendedorForm vendedorForm)
+        public IActionResult PostVendedor([FromBody] VendedorForm form)
         {
-            if (vendedorForm is null)
+            if (form is null)
             {
                 return BadRequest();
             }
 
-            this.vendedorRepository!.InsertVendedor(vendedorForm.ToVendedor());
+            this.vendedorRepository!.InsertVendedor(form.ToVendedor());
 
             var vendedor = this.vendedorRepository.GetUltimoVendedor();
 
@@ -51,25 +72,25 @@ namespace projeto_dotnet_sql.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateVendedor(int id, [FromBody] VendedorForm vendedorForm)
+        public IActionResult UpdateVendedor(int id, [FromBody] VendedorForm form)
         {
-            if (vendedorForm is null)
+            if (form is null)
             {
                 return BadRequest();
             }
 
-            var entity = this.vendedorRepository!.GetVendedorPorID(id);
+            var vendedor = this.vendedorRepository!.GetVendedorPorID(id);
 
-            if (entity is null)
+            if (vendedor is null)
             {
                 return NotFound($"Vendedor com o id \"{id}\" não foi encontrado");
             }
 
-            this.vendedorRepository.UpdateVendedor(entity, vendedorForm);
+            this.vendedorRepository.UpdateVendedor(vendedor, form);
 
-            entity = this.vendedorRepository.GetVendedorPorID(id);
+            vendedor = this.vendedorRepository.GetVendedorPorID(id);
 
-            return Ok(entity);
+            return Ok(vendedor);
         }
 
         [HttpDelete("{id}")]
@@ -84,7 +105,7 @@ namespace projeto_dotnet_sql.Controllers
 
             this.vendedorRepository.DeleteVendedor(id);
 
-            return Ok();
+            return Accepted();
         }
     }
 }

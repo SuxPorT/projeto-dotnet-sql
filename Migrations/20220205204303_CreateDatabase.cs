@@ -30,10 +30,9 @@ namespace projeto_dotnet_sql.Migrations
                     IndicadorPessoa = table.Column<string>(type: "nvarchar(1)", maxLength: 1, nullable: false),
                     Nome = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    TelefoneId = table.Column<int>(type: "int", nullable: false),
                     DataNascimento = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Cidade = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Estado = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UF = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CEP = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -42,16 +41,21 @@ namespace projeto_dotnet_sql.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Telefones",
+                name: "Veiculos",
                 columns: table => new
                 {
-                    TelefoneId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Codigo = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
+                    NumeroChassi = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProprietarioCpfCnpj = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Modelo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Ano = table.Column<int>(type: "int", maxLength: 30, nullable: false),
+                    Valor = table.Column<double>(type: "float", nullable: false),
+                    Quilometragem = table.Column<double>(type: "float", nullable: false),
+                    Cor = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true),
+                    VersaoSistema = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Telefones", x => x.TelefoneId);
+                    table.PrimaryKey("PK_Veiculos", x => x.NumeroChassi);
                 });
 
             migrationBuilder.CreateTable(
@@ -69,23 +73,19 @@ namespace projeto_dotnet_sql.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Veiculos",
+                name: "Telefones",
                 columns: table => new
                 {
-                    NumeroChassi = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    TelefoneId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     ProprietarioCpfCnpj = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    Modelo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Ano = table.Column<int>(type: "int", maxLength: 30, nullable: false),
-                    Valor = table.Column<double>(type: "float", nullable: false),
-                    Quilometragem = table.Column<double>(type: "float", nullable: false),
-                    Cor = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true),
-                    VersaoSistema = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
+                    Codigo = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Veiculos", x => x.NumeroChassi);
+                    table.PrimaryKey("PK_Telefones", x => x.TelefoneId);
                     table.ForeignKey(
-                        name: "FK_Veiculos_Proprietarios_ProprietarioCpfCnpj",
+                        name: "FK_Telefones_Proprietarios_ProprietarioCpfCnpj",
                         column: x => x.ProprietarioCpfCnpj,
                         principalTable: "Proprietarios",
                         principalColumn: "CpfCnpj");
@@ -120,8 +120,8 @@ namespace projeto_dotnet_sql.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Veiculos_ProprietarioCpfCnpj",
-                table: "Veiculos",
+                name: "IX_Telefones_ProprietarioCpfCnpj",
+                table: "Telefones",
                 column: "ProprietarioCpfCnpj");
 
             migrationBuilder.CreateIndex(
@@ -147,13 +147,13 @@ namespace projeto_dotnet_sql.Migrations
                 name: "Vendas");
 
             migrationBuilder.DropTable(
+                name: "Proprietarios");
+
+            migrationBuilder.DropTable(
                 name: "Veiculos");
 
             migrationBuilder.DropTable(
                 name: "Vendedores");
-
-            migrationBuilder.DropTable(
-                name: "Proprietarios");
         }
     }
 }

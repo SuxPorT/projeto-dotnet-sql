@@ -1,3 +1,4 @@
+using projeto_dotnet_sql.DAL.Interfaces;
 using projeto_dotnet_sql.Models;
 using projeto_dotnet_sql.Models.Form;
 
@@ -23,16 +24,16 @@ namespace projeto_dotnet_sql.DAL
             return this.context.Vendedores!.Find(vendedorId)!;
         }
 
+        public Vendedor GetUltimoVendedor()
+        {
+            return this.context.Vendedores!.OrderBy(e => e.VendedorId)
+                                           .Last<Vendedor>();
+        }
+
         public void InsertVendedor(Vendedor vendedor)
         {
             this.context.Vendedores!.Add(vendedor);
             this.Save();
-        }
-
-        public Vendedor GetUltimoVendedor()
-        {
-            return this.context.Vendedores!.OrderBy(e => e.VendedorId)
-                .Last<Vendedor>();
         }
 
         public void UpdateVendedor(Vendedor vendedor, VendedorForm vendedorAtualizado)

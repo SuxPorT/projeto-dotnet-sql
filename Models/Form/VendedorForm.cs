@@ -14,7 +14,11 @@ namespace projeto_dotnet_sql.Models.Form
 
         public Vendedor ToVendedor()
         {
-            return new Vendedor(Nome!, SalarioMinimo);
+            return new Vendedor
+            {
+                Nome = this.Nome,
+                SalarioMinimo = this.SalarioMinimo
+            };
         }
     }
 }

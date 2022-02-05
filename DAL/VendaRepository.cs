@@ -1,4 +1,6 @@
+using projeto_dotnet_sql.DAL.Interfaces;
 using projeto_dotnet_sql.Models;
+using projeto_dotnet_sql.Models.Form;
 
 namespace projeto_dotnet_sql.DAL
 {
@@ -20,6 +22,33 @@ namespace projeto_dotnet_sql.DAL
         public Venda GetVendaPorID(int vendaId)
         {
             return this.context.Vendas!.Find(vendaId)!;
+        }
+
+        public Venda GetUltimaVenda()
+        {
+            return this.context.Vendas!.OrderBy(e => e.VendaId)
+                                       .Last<Venda>();
+        }
+
+        public void InsertVenda(Venda venda)
+        {
+            this.context.Vendas!.Add(venda);
+            this.Save();
+        }
+
+        public void UpdateVenda(Venda venda, VendaForm vendaAtualizada)
+        {
+            this.context.Entry(venda).CurrentValues
+                        .SetValues(vendaAtualizada);
+            this.Save();
+        }
+
+        public void DeleteVenda(int vendaId)
+        {
+            var venda = this.context.Vendas!.Find(vendaId);
+
+            context.Vendas.Remove(venda!);
+            this.Save();
         }
 
         public void Save()

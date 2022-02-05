@@ -1,14 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace projeto_dotnet_sql.Models
+namespace projeto_dotnet_sql.Models.Form
 {
-    public class Telefone
+    public class TelefoneForm
     {
-        [Key]
-        public int TelefoneId { get; set; }
-
-        [ForeignKey("DocumentoProprietario")]
         public string? ProprietarioCpfCnpj { get; set; }
 
         [Required(ErrorMessage = "O campo \"codigo\" é necessário")]
@@ -16,6 +11,15 @@ namespace projeto_dotnet_sql.Models
         [MaxLength(20, ErrorMessage = "O telefone deve possuir no máximo 20 caracteres")]
         public string? Codigo { get; set; }
 
-        public Telefone() { }
+        public TelefoneForm() { }
+
+        public Telefone ToTelefone()
+        {
+            return new Telefone
+            {
+                ProprietarioCpfCnpj = this.ProprietarioCpfCnpj,
+                Codigo = this.Codigo
+            };
+        }
     }
 }

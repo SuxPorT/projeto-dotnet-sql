@@ -1,21 +1,20 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace projeto_dotnet_sql.Models.Form
+namespace projeto_dotnet_sql.Models.DTO
 {
-    public class VeiculoForm
+    public class VeiculoDTO
     {
         [Key]
         public string? NumeroChassi { get; set; }
 
-        [ForeignKey("CpfCnpj")]
-        public string? ProprietarioCpfCnpj { get; set; }
+        public Proprietario? Proprietario { get; set; }
 
         [Required(ErrorMessage = "O campo \"Modelo\" é necessário")]
         [MaxLength(50)]
         public string? Modelo { get; set; }
 
         [Required(ErrorMessage = "O campo \"Ano\" é necessário")]
+        [MaxLength(30)]
         public int Ano { get; set; }
 
         [Required(ErrorMessage = "O campo \"Valor\" é necessário")]
@@ -30,21 +29,6 @@ namespace projeto_dotnet_sql.Models.Form
         [MaxLength(10)]
         public string? VersaoSistema { get; set; } = null;
 
-        public VeiculoForm() { }
-
-        public Veiculo ToVeiculo()
-        {
-            return new Veiculo
-            {
-                NumeroChassi = this.NumeroChassi,
-                ProprietarioCpfCnpj = this.ProprietarioCpfCnpj,
-                Modelo = this.Modelo,
-                Ano = this.Ano,
-                Valor = this.Valor,
-                Quilometragem = this.Quilometragem,
-                Cor = this.Cor,
-                VersaoSistema = this.VersaoSistema
-            };
-        }
+        public VeiculoDTO() { }
     }
 }
