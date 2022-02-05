@@ -31,14 +31,16 @@ namespace projeto_dotnet_sql.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AcessorioId"), 1L, 1);
 
                     b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("AcessorioId");
 
                     b.ToTable("Acessorios");
                 });
 
-            modelBuilder.Entity("projeto_dotnet_sql.Models.Pessoa", b =>
+            modelBuilder.Entity("projeto_dotnet_sql.Models.Proprietario", b =>
                 {
                     b.Property<string>("CpfCnpj")
                         .HasColumnType("nvarchar(450)");
@@ -73,7 +75,7 @@ namespace projeto_dotnet_sql.Migrations
 
                     b.HasKey("CpfCnpj");
 
-                    b.ToTable("Pessoas");
+                    b.ToTable("Proprietarios");
                 });
 
             modelBuilder.Entity("projeto_dotnet_sql.Models.Telefone", b =>
@@ -85,6 +87,7 @@ namespace projeto_dotnet_sql.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TelefoneId"), 1L, 1);
 
                     b.Property<string>("Codigo")
+                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
@@ -111,8 +114,8 @@ namespace projeto_dotnet_sql.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("ProprietarioId")
-                        .HasColumnType("int");
+                    b.Property<string>("ProprietarioCpfCnpj")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<double>("Quilometragem")
                         .HasColumnType("float");
@@ -125,6 +128,8 @@ namespace projeto_dotnet_sql.Migrations
                         .HasColumnType("nvarchar(10)");
 
                     b.HasKey("NumeroChassi");
+
+                    b.HasIndex("ProprietarioCpfCnpj");
 
                     b.ToTable("Veiculos");
                 });
@@ -142,7 +147,7 @@ namespace projeto_dotnet_sql.Migrations
 
                     b.Property<string>("NumeroChassi")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<double>("ValorComissao")
                         .HasColumnType("float");
@@ -151,6 +156,8 @@ namespace projeto_dotnet_sql.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("VendaId");
+
+                    b.HasIndex("NumeroChassi");
 
                     b.HasIndex("VendedorId");
 
@@ -178,13 +185,32 @@ namespace projeto_dotnet_sql.Migrations
                     b.ToTable("Vendedores");
                 });
 
+            modelBuilder.Entity("projeto_dotnet_sql.Models.Veiculo", b =>
+                {
+                    b.HasOne("projeto_dotnet_sql.Models.Proprietario", "Proprietario")
+                        .WithMany()
+                        .HasForeignKey("ProprietarioCpfCnpj");
+
+                    b.Navigation("Proprietario");
+                });
+
             modelBuilder.Entity("projeto_dotnet_sql.Models.Venda", b =>
                 {
-                    b.HasOne("projeto_dotnet_sql.Models.Vendedor", null)
+                    b.HasOne("projeto_dotnet_sql.Models.Veiculo", "Veiculo")
+                        .WithMany()
+                        .HasForeignKey("NumeroChassi")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("projeto_dotnet_sql.Models.Vendedor", "Vendedor")
                         .WithMany("Vendas")
                         .HasForeignKey("VendedorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Veiculo");
+
+                    b.Navigation("Vendedor");
                 });
 
             modelBuilder.Entity("projeto_dotnet_sql.Models.Vendedor", b =>

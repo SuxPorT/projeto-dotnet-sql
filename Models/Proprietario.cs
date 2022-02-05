@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace projeto_dotnet_sql.Models
 {
-    public class Pessoa
+    public class Proprietario
     {
         [Key]
         public string? CpfCnpj { get; set; }
@@ -25,6 +25,6 @@ namespace projeto_dotnet_sql.Models
         public string? Estado { get; set; }
         public string? CEP { get; set; }
 
-        public Pessoa() { }
+        public Proprietario() { }
     }
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace projeto_dotnet_sql.Models.Form
 {
@@ -7,8 +8,8 @@ namespace projeto_dotnet_sql.Models.Form
         [Key]
         public string? NumeroChassi { get; set; }
 
-        //[Foreign key]
-        public int ProprietarioId { get; set; }
+        [ForeignKey("CpfCnpj")]
+        public string? ProprietarioCpfCnpj { get; set; }
 
         [Required(ErrorMessage = "O campo \"Modelo\" é necessário")]
         [MaxLength(50)]
@@ -34,7 +35,7 @@ namespace projeto_dotnet_sql.Models.Form
         public Veiculo ToVeiculo()
         {
             return new Veiculo(NumeroChassi!,
-                               ProprietarioId,
+                               ProprietarioCpfCnpj!,
                                Modelo!,
                                Ano,
                                Valor,

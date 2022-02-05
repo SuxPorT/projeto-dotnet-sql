@@ -2,24 +2,24 @@ using projeto_dotnet_sql.Models;
 
 namespace projeto_dotnet_sql.DAL
 {
-    public class PessoaRepository : IPessoaRepository, IDisposable
+    public class ProprietarioRepository : IProprietarioRepository, IDisposable
     {
         private ConcessionariaContext context;
         private bool disposed = false;
 
-        public PessoaRepository(ConcessionariaContext context)
+        public ProprietarioRepository(ConcessionariaContext context)
         {
             this.context = context;
         }
 
-        public IEnumerable<Pessoa> GetPessoas()
+        public IEnumerable<Proprietario> GetProprietarios()
         {
-            return this.context.Pessoas!.ToList();
+            return this.context.Proprietarios!.ToList();
         }
 
-        public Pessoa GetPessoaPorCpfCnpj(string pessoaCpfCnpj)
+        public Proprietario GetProprietarioPorCpfCnpj(string proprietarioCpfCnpj)
         {
-            return this.context.Pessoas!.Find(pessoaCpfCnpj)!;
+            return this.context.Proprietarios!.Find(proprietarioCpfCnpj)!;
         }
 
         public void Save()

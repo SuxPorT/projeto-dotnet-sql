@@ -15,12 +15,14 @@ namespace projeto_dotnet_sql.Models
         public double ValorComissao { get; set; }
 
         [Required]
-        [ForeignKey("NumeroChassi")]
+        [ForeignKey("Veiculo")]
         public string? NumeroChassi { get; set; }
+        public Veiculo? Veiculo { get; set; }
 
         [Required]
-        [ForeignKey("VendedorId")]
+        [ForeignKey("Vendedor")]
         public int VendedorId { get; set; }
+        public Vendedor? Vendedor { get; set; }
 
         public Venda() { }
     }

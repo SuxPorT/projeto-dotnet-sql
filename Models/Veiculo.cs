@@ -7,9 +7,10 @@ namespace projeto_dotnet_sql.Models
     {
         [Key]
         public string? NumeroChassi { get; set; }
-        
-        [ForeignKey("PessoaId")]
-        public int ProprietarioId { get; set; }
+
+        [ForeignKey("DocumentoProprietario")]
+        public string? ProprietarioCpfCnpj { get; set; }
+        public Proprietario? Proprietario { get; set; }
 
         [Required(ErrorMessage = "O campo \"Modelo\" é necessário")]
         [MaxLength(50)]
@@ -34,7 +35,7 @@ namespace projeto_dotnet_sql.Models
         public Veiculo() { }
 
         public Veiculo(string numeroChassi,
-                       int proprietarioId,
+                       string proprietarioCpfCnpj,
                        string modelo,
                        int ano,
                        double valor,
@@ -43,7 +44,7 @@ namespace projeto_dotnet_sql.Models
                        string versaoSistema)
         {
             NumeroChassi = numeroChassi;
-            ProprietarioId = proprietarioId;
+            ProprietarioCpfCnpj = proprietarioCpfCnpj;
             Modelo = modelo;
             Ano = ano;
             Valor = valor;

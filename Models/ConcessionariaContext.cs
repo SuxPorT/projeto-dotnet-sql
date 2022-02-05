@@ -4,7 +4,7 @@ namespace projeto_dotnet_sql.Models
 {
     public class ConcessionariaContext : DbContext
     {
-        public DbSet<Pessoa>? Pessoas { get; set; } = null;
+        public DbSet<Proprietario>? Proprietarios { get; set; } = null;
         public DbSet<Telefone>? Telefones { get; set; } = null;
         public DbSet<Veiculo>? Veiculos { get; set; } = null;
         public DbSet<Acessorio>? Acessorios { get; set; } = null;
