@@ -9,23 +9,23 @@ namespace projeto_dotnet_sql.Controllers
     [Route("api/[controller]")]
     public class VeiculoController : ControllerBase
     {
-        private IVeiculoRepository? veiculoRepository;
+        private IVeiculoRepository? pessoaRepository;
 
         public VeiculoController()
         {
-            this.veiculoRepository = new VeiculoRepository(new ConcessionariaContext());
+            this.pessoaRepository = new VeiculoRepository(new ConcessionariaContext());
         }
 
         [HttpGet]
         public IEnumerable<Veiculo> GetVeiculos()
         {
-            return this.veiculoRepository!.GetVeiculos();
+            return this.pessoaRepository!.GetVeiculos();
         }
 
         [HttpGet("{numeroChassi}")]
         public IActionResult GetVendedorPorNumeroChassi(string numeroChassi)
         {
-            var veiculo = this.veiculoRepository!.GetVeiculoPorNumeroChassi(numeroChassi);
+            var veiculo = this.pessoaRepository!.GetVeiculoPorNumeroChassi(numeroChassi);
 
             if (veiculo is null)
             {
@@ -43,11 +43,11 @@ namespace projeto_dotnet_sql.Controllers
                 return BadRequest();
             }
 
-            this.veiculoRepository!.InsertVeiculo(veiculoForm.ToVeiculo());
+            this.pessoaRepository!.InsertVeiculo(veiculoForm.ToVeiculo());
 
             // Não necessariamente irá pegar o veículo criado 
-            // (já que ordena pelo chassi)
-            var veiculo = this.veiculoRepository.GetUltimoVeiculo();
+            // (já que ordena pelo chassi, que é uma string)
+            var veiculo = this.pessoaRepository.GetUltimoVeiculo();
 
             return Ok(veiculo);
         }
@@ -60,16 +60,16 @@ namespace projeto_dotnet_sql.Controllers
                 return BadRequest();
             }
 
-            var entity = this.veiculoRepository!.GetVeiculoPorNumeroChassi(numeroChassi);
+            var entity = this.pessoaRepository!.GetVeiculoPorNumeroChassi(numeroChassi);
 
             if (entity is null)
             {
                 return NotFound($"Veículo com o chassi \"{numeroChassi}\" não foi encontrado");
             }
 
-            this.veiculoRepository.UpdateVeiculo(entity, veiculoForm);
+            this.pessoaRepository.UpdateVeiculo(entity, veiculoForm);
 
-            entity = this.veiculoRepository.GetVeiculoPorNumeroChassi(numeroChassi);
+            entity = this.pessoaRepository.GetVeiculoPorNumeroChassi(numeroChassi);
 
             return Ok(entity);
         }
@@ -77,14 +77,14 @@ namespace projeto_dotnet_sql.Controllers
         [HttpDelete("{numeroChassi}")]
         public IActionResult DeleteVendedor(string numeroChassi)
         {
-            var vendedor = this.veiculoRepository!.GetVeiculoPorNumeroChassi(numeroChassi);
+            var vendedor = this.pessoaRepository!.GetVeiculoPorNumeroChassi(numeroChassi);
 
             if (vendedor is null)
             {
                 return NotFound($"Veículo com o chassi \"{numeroChassi}\" não foi encontrado");
             }
 
-            this.veiculoRepository.DeleteVeiculo(numeroChassi);
+            this.pessoaRepository.DeleteVeiculo(numeroChassi);
 
             return Ok();
         }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace projeto_dotnet_sql.Models
 {
@@ -6,7 +7,8 @@ namespace projeto_dotnet_sql.Models
     {
         [Key]
         public string? NumeroChassi { get; set; }
-        //[Foreign key]
+        
+        [ForeignKey("PessoaId")]
         public int ProprietarioId { get; set; }
 
         [Required(ErrorMessage = "O campo \"Modelo\" é necessário")]

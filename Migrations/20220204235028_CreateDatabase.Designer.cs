@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using projeto_dotnet_sql.Models;
 
@@ -11,9 +12,10 @@ using projeto_dotnet_sql.Models;
 namespace projeto_dotnet_sql.Migrations
 {
     [DbContext(typeof(ConcessionariaContext))]
-    partial class ConcessionariaContextModelSnapshot : ModelSnapshot
+    [Migration("20220204235028_CreateDatabase")]
+    partial class CreateDatabase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
