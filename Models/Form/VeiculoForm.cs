@@ -37,13 +37,13 @@ namespace projeto_dotnet_sql.Models.Form
             return new Veiculo
             {
                 NumeroChassi = this.NumeroChassi,
-                ProprietarioCpfCnpj = this.ProprietarioCpfCnpj,
                 Modelo = this.Modelo,
                 Ano = this.Ano,
+                Cor = this.Cor,
                 Valor = this.Valor,
                 Quilometragem = this.Quilometragem,
-                Cor = this.Cor,
-                VersaoSistema = this.VersaoSistema
+                VersaoSistema = this.VersaoSistema,
+                ProprietarioCpfCnpj = this.ProprietarioCpfCnpj
             };
         }
     }

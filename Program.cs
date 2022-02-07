@@ -8,6 +8,8 @@
 */
 using Microsoft.OpenApi.Models;
 
+System.IO.Directory.CreateDirectory("Logs");
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

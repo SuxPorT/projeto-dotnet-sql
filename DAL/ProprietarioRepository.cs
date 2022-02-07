@@ -24,10 +24,12 @@ namespace projeto_dotnet_sql.DAL
             return this.context.Proprietarios!.Find(proprietarioCpfCnpj)!;
         }
 
-        public void InsertProprietario(Proprietario proprietario)
+        public Proprietario InsertProprietario(Proprietario proprietario)
         {
             this.context.Proprietarios!.Add(proprietario);
             this.Save();
+
+            return proprietario;
         }
 
         public Proprietario GetUltimoProprietario()

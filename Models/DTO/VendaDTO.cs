@@ -13,7 +13,7 @@ namespace projeto_dotnet_sql.Controllers.DTO
         public DateTime DataVenda { get; set; }
 
         [Required]
-        public double ValorComissao { get; set; }
+        public double ValorVenda { get; set; }
 
         public Veiculo? Veiculo { get; set; }
 

@@ -8,7 +8,7 @@ namespace projeto_dotnet_sql.DAL.Interfaces
         IEnumerable<Proprietario> GetProprietarios();
         Proprietario GetProprietarioPorCpfCnpj(string proprietarioCpfCnpj);
         Proprietario GetUltimoProprietario();
-        void InsertProprietario(Proprietario proprietario);
+        Proprietario InsertProprietario(Proprietario proprietario);
         void UpdateProprietario(Proprietario proprietario, ProprietarioForm proprietarioAtualizado);
         void DeleteProprietario(string cpfCnpj);
         void Save();

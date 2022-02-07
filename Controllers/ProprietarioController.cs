@@ -26,28 +26,25 @@ namespace projeto_dotnet_sql.Controllers
             var proprietarios = this.proprietarioRepository!.GetProprietarios();
             var telefones = this.telefoneRepository!.GetTelefones();
 
-            var proprietariosComTelefones = new List<Proprietario>();
+            var proprietariosDTO = new HashSet<ProprietarioDTO>();
 
-            var proprietarioDTO = proprietarios.Join(
-                telefones,
-                proprietario => proprietario.CpfCnpj,
-                telefone => telefone.ProprietarioCpfCnpj,
-
-                (proprietario, telefone) => new ProprietarioDTO
+            foreach (var proprietario in proprietarios)
+            {
+                proprietariosDTO.Add(new ProprietarioDTO
                 {
                     CpfCnpj = proprietario.CpfCnpj,
                     IndicadorPessoa = proprietario.IndicadorPessoa,
                     Nome = proprietario.Nome,
                     Email = proprietario.Email,
-                    Telefones = new List<Telefone> { telefone },
+                    Telefones = telefones.Where(t => t.ProprietarioCpfCnpj == proprietario.CpfCnpj).ToList(),
                     DataNascimento = proprietario.DataNascimento,
                     Cidade = proprietario.Cidade,
                     UF = proprietario.UF,
                     CEP = proprietario.CEP
-                }
-            );
+                });
+            }
 
-            return proprietarioDTO;
+            return proprietariosDTO;
         }
 
         [HttpGet("{cpfCnpj}")]
@@ -86,13 +83,9 @@ namespace projeto_dotnet_sql.Controllers
                 return BadRequest();
             }
 
-            this.proprietarioRepository!.InsertProprietario(form.ToProprietario());
+            var proprietario = this.proprietarioRepository!.InsertProprietario(form.ToProprietario());
 
-            // Não necessariamente irá pegar o proprietário criado 
-            // (já que ordena pelo cpfCnpj, que é uma string)
-            var veiculo = this.proprietarioRepository.GetUltimoProprietario();
-
-            return Ok(veiculo);
+            return Ok(proprietario);
         }
 
         [HttpPut("{cpfCnpj}")]

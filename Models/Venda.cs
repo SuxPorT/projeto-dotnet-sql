@@ -12,7 +12,7 @@ namespace projeto_dotnet_sql.Models
         public DateTime DataVenda { get; set; }
 
         [Required]
-        public double ValorComissao { get; set; }
+        public double ValorVenda { get; set; }
 
         [Required]
         [ForeignKey("Veiculo")]

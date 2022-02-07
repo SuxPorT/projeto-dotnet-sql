@@ -12,7 +12,7 @@ using projeto_dotnet_sql.Models;
 namespace projeto_dotnet_sql.Migrations
 {
     [DbContext(typeof(ConcessionariaContext))]
-    [Migration("20220205204303_CreateDatabase")]
+    [Migration("20220207013031_CreateDatabase")]
     partial class CreateDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -151,7 +151,7 @@ namespace projeto_dotnet_sql.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<double>("ValorComissao")
+                    b.Property<double>("ValorVenda")
                         .HasColumnType("float");
 
                     b.Property<int>("VendedorId")
@@ -179,7 +179,7 @@ namespace projeto_dotnet_sql.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<double>("SalarioMinimo")
+                    b.Property<double>("SalarioBase")
                         .HasColumnType("float");
 
                     b.HasKey("VendedorId");

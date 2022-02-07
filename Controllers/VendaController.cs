@@ -40,7 +40,7 @@ namespace projeto_dotnet_sql.Controllers
                 {
                     VendaId = venda.VendaId,
                     DataVenda = venda.DataVenda,
-                    ValorComissao = veiculo.Valor * 0.1,
+                    ValorVenda = veiculo.Valor,
                     Veiculo = veiculo,
                     Vendedor = vendedor
                 }

@@ -16,12 +16,16 @@ namespace projeto_dotnet_sql.Models.DTO
         [MaxLength(50, ErrorMessage = "O email deve ter no máximo 50 caracteres")]
         public string? Email { get; set; }
 
-        public List<Telefone> Telefones { get; set; } = new List<Telefone>();
+        public ICollection<Telefone> Telefones { get; set; }
 
         public DateTime DataNascimento { get; set; }
         public string? Cidade { get; set; }
         public string? UF { get; set; }
         public string? CEP { get; set; }
-        public ProprietarioDTO() { }
+
+        public ProprietarioDTO()
+        {
+            this.Telefones = new HashSet<Telefone>();
+        }
     }
 }

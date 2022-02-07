@@ -1,3 +1,4 @@
+using Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using projeto_dotnet_sql.DAL;
 using projeto_dotnet_sql.DAL.Interfaces;
@@ -26,17 +27,17 @@ namespace projeto_dotnet_sql.Controllers
             var vendedores = this.vendedorRepository!.GetVendedores();
             var vendas = this.vendaRepository!.GetVendas();
 
-            var vendedorDTO = vendedores.Join(
-                vendas,
-                vendedor => vendedor.VendedorId,
-                venda => venda.VendedorId,
+            var vendedorDTO = (
+                from vendedor in vendedores
+                join venda in vendas
+                on vendedor.VendedorId equals venda.VendedorId
 
-                (vendedor, venda) => new VendedorDTO
+                select new VendedorDTO
                 {
                     VendedorId = vendedor.VendedorId,
                     Nome = vendedor.Nome,
-                    SalarioMinimo = vendedor.SalarioMinimo,
-                    Vendas = new List<Venda> { venda }
+                    SalarioBase = vendedor.SalarioBase + venda.ValorVenda * 0.01,
+                    Vendas = vendas.Where(v => v.VendedorId == vendedor.VendedorId).ToList()
                 }
             );
 
@@ -46,66 +47,109 @@ namespace projeto_dotnet_sql.Controllers
         [HttpGet("{id}")]
         public IActionResult GetVendedorPorID(int id)
         {
-            var vendedor = this.vendedorRepository!.GetVendedorPorID(id);
-
-            if (vendedor is null)
+            try
             {
-                return NotFound($"Vendedor com o id \"{id}\" não foi encontrado");
-            }
+                var vendedor = this.vendedorRepository!.GetVendedorPorID(id);
 
-            return Ok(vendedor);
+                if (vendedor is null)
+                {
+                    throw new NotFoundException(typeof(Vendedor).Name, $"Vendedor com o id \"{id}\" não foi encontrado");
+                }
+
+                return Ok(vendedor);
+            }
+            catch (NotFoundException e)
+            {
+                e.CriarLog();
+
+                return NotFound(e.Message);
+            }
         }
 
         [HttpPost]
         public IActionResult PostVendedor([FromBody] VendedorForm form)
         {
-            if (form is null)
+            try
             {
+                if (form is null)
+                {
+                    throw new BadRequestException(typeof(VendedorForm).Name, "O formulário está vazio");
+                }
+
+                this.vendedorRepository!.InsertVendedor(form.ToVendedor());
+
+                var vendedor = this.vendedorRepository.GetUltimoVendedor();
+
+                return Ok(vendedor);
+            }
+            catch (BadRequestException e)
+            {
+                e.CriarLog();
+
                 return BadRequest();
             }
 
-            this.vendedorRepository!.InsertVendedor(form.ToVendedor());
-
-            var vendedor = this.vendedorRepository.GetUltimoVendedor();
-
-            return Ok(vendedor);
         }
 
         [HttpPut("{id}")]
         public IActionResult UpdateVendedor(int id, [FromBody] VendedorForm form)
         {
-            if (form is null)
+            try
             {
+                if (form is null)
+                {
+                    throw new BadRequestException(typeof(VendedorForm).Name, "O formulário está vazio");
+                }
+
+                var vendedor = this.vendedorRepository!.GetVendedorPorID(id);
+
+                if (vendedor is null)
+                {
+                    throw new NotFoundException(typeof(Vendedor).Name, $"Vendedor com o id \"{id}\" não foi encontrado");
+                }
+
+                this.vendedorRepository.UpdateVendedor(vendedor, form);
+
+                vendedor = this.vendedorRepository.GetVendedorPorID(id);
+
+                return Ok(vendedor);
+            }
+            catch (BadRequestException e)
+            {
+                e.CriarLog();
+
                 return BadRequest();
             }
-
-            var vendedor = this.vendedorRepository!.GetVendedorPorID(id);
-
-            if (vendedor is null)
+            catch (NotFoundException e)
             {
-                return NotFound($"Vendedor com o id \"{id}\" não foi encontrado");
+                e.CriarLog();
+
+                return NotFound(e.Message);
             }
-
-            this.vendedorRepository.UpdateVendedor(vendedor, form);
-
-            vendedor = this.vendedorRepository.GetVendedorPorID(id);
-
-            return Ok(vendedor);
         }
 
         [HttpDelete("{id}")]
         public IActionResult DeleteVendedor(int id)
         {
-            var vendedor = this.vendedorRepository!.GetVendedorPorID(id);
-
-            if (vendedor is null)
+            try
             {
-                return NotFound($"Vendedor com o id \"{id}\" não foi encontrado");
+                var vendedor = this.vendedorRepository!.GetVendedorPorID(id);
+
+                if (vendedor is null)
+                {
+                    throw new NotFoundException(typeof(Vendedor).Name, $"Vendedor com o id \"{id}\" não foi encontrado");
+                }
+
+                this.vendedorRepository.DeleteVendedor(id);
+
+                return Accepted();
             }
+            catch (NotFoundException e)
+            {
+                e.CriarLog();
 
-            this.vendedorRepository.DeleteVendedor(id);
-
-            return Accepted();
+                return NotFound(e.Message);
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ namespace projeto_dotnet_sql.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetTelefonePorID(int id)
+        public IActionResult GetAcessorioPorID(int id)
         {
             var acessorio = this.acessorioRepository!.GetAcessorioPorID(id);
 
@@ -37,7 +37,7 @@ namespace projeto_dotnet_sql.Controllers
         }
 
         [HttpPost]
-        public IActionResult PostTelefone([FromBody] AcessorioForm form)
+        public IActionResult PostAcessorio([FromBody] AcessorioForm form)
         {
             if (form is null)
             {
@@ -46,13 +46,13 @@ namespace projeto_dotnet_sql.Controllers
 
             this.acessorioRepository!.InsertAcessorio(form.ToAcessorio());
 
-            var telefone = this.acessorioRepository.GetUltimoAcessorio();
+            var acessorio = this.acessorioRepository.GetUltimoAcessorio();
 
-            return Ok(telefone);
+            return Ok(acessorio);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateTelefone(int id, [FromBody] AcessorioForm form)
+        public IActionResult UpdateAcessorio(int id, [FromBody] AcessorioForm form)
         {
             if (form is null)
             {

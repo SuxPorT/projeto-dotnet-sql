@@ -30,10 +30,12 @@ namespace projeto_dotnet_sql.DAL
                                          .Last<Veiculo>();
         }
 
-        public void InsertVeiculo(Veiculo veiculo)
+        public Veiculo InsertVeiculo(Veiculo veiculo)
         {
             this.context.Veiculos!.Add(veiculo);
             this.Save();
+
+            return veiculo;
         }
 
         public void UpdateVeiculo(Veiculo veiculo, VeiculoForm veiculoAtualizado)

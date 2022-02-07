@@ -26,21 +26,21 @@ namespace projeto_dotnet_sql.Controllers
             var veiculos = this.veiculoRepository!.GetVeiculos();
             var proprietarios = this.proprietarioRepository!.GetProprietarios();
 
-            var veiculoDTO = veiculos.Join(
-                proprietarios,
-                veiculo => veiculo.ProprietarioCpfCnpj,
-                proprietario => proprietario.CpfCnpj,
+            var veiculoDTO = (
+                from veiculo in veiculos
+                join proprietario in proprietarios
+                on veiculo.ProprietarioCpfCnpj equals proprietario.CpfCnpj
 
-                (v, p) => new VeiculoDTO
+                select new VeiculoDTO
                 {
-                    NumeroChassi = v.NumeroChassi,
-                    Proprietario = p,
-                    Modelo = v.Modelo,
-                    Ano = v.Ano,
-                    Valor = v.Valor,
-                    Quilometragem = v.Quilometragem,
-                    Cor = v.Cor,
-                    VersaoSistema = v.VersaoSistema
+                    NumeroChassi = veiculo.NumeroChassi,
+                    Modelo = veiculo.Modelo,
+                    Ano = veiculo.Ano,
+                    Cor = veiculo.Cor,
+                    Valor = veiculo.Valor,
+                    Quilometragem = veiculo.Quilometragem,
+                    VersaoSistema = veiculo.VersaoSistema,
+                    Proprietario = proprietario
                 }
             );
 
@@ -62,16 +62,45 @@ namespace projeto_dotnet_sql.Controllers
             var veiculoDTO = new VeiculoDTO
             {
                 NumeroChassi = veiculo.NumeroChassi,
-                Proprietario = proprietarios.Where(p => p.CpfCnpj == veiculo.ProprietarioCpfCnpj).ToList()[0],
                 Modelo = veiculo.Modelo,
                 Ano = veiculo.Ano,
+                Cor = veiculo.Cor,
                 Valor = veiculo.Valor,
                 Quilometragem = veiculo.Quilometragem,
-                Cor = veiculo.Cor,
-                VersaoSistema = veiculo.VersaoSistema
+                VersaoSistema = veiculo.VersaoSistema,
+                Proprietario = proprietarios.Where(p => p.CpfCnpj == veiculo.ProprietarioCpfCnpj).ToList()[0]
             };
 
             return Ok(veiculoDTO);
+        }
+
+        [HttpGet("busca")]
+        public IActionResult GetPorQuilometragem(
+            [FromQuery(Name = "quilometragem")] string quilometragem,
+            [FromQuery(Name = "versaoSistema")] string versaoSistema)
+        {
+            if ((quilometragem == null && versaoSistema == null) || (quilometragem == "" && versaoSistema == ""))
+            {
+                return BadRequest();
+            }
+
+            var veiculos = this.veiculoRepository!.GetVeiculos();
+            var resultado = new HashSet<Veiculo>();
+
+            foreach (var veiculo in veiculos)
+            {
+                if (veiculo.Quilometragem == Double.Parse(quilometragem!) && veiculo.VersaoSistema == versaoSistema)
+                {
+                    resultado.Add(veiculo);
+                }
+            }
+
+            if (resultado.Count > 0)
+            {
+                return Ok(resultado);
+            }
+
+            return NotFound();
         }
 
         [HttpPost]
@@ -82,11 +111,7 @@ namespace projeto_dotnet_sql.Controllers
                 return BadRequest();
             }
 
-            this.veiculoRepository!.InsertVeiculo(form.ToVeiculo());
-
-            // Não necessariamente irá pegar o veículo criado 
-            // (já que ordena pelo chassi, que é uma string)
-            var veiculo = this.veiculoRepository.GetUltimoVeiculo();
+            var veiculo = this.veiculoRepository!.InsertVeiculo(form.ToVeiculo());
 
             return Ok(veiculo);
         }

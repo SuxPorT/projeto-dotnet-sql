@@ -8,7 +8,7 @@ namespace projeto_dotnet_sql.DAL.Interfaces
         IEnumerable<Veiculo> GetVeiculos();
         Veiculo GetVeiculoPorNumeroChassi(string numeroChassi);
         Veiculo GetUltimoVeiculo();
-        void InsertVeiculo(Veiculo veiculo);
+        Veiculo InsertVeiculo(Veiculo veiculo);
         void UpdateVeiculo(Veiculo veiculo, VeiculoForm veiculoAtualizado);
         void DeleteVeiculo(string numeroChassi);
         void Save();

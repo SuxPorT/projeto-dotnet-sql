@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using projeto_dotnet_sql.DAL;
 using projeto_dotnet_sql.DAL.Interfaces;
 using projeto_dotnet_sql.Models;
+using projeto_dotnet_sql.Models.DTO;
 using projeto_dotnet_sql.Models.Form;
 
 namespace projeto_dotnet_sql.Controllers
@@ -11,16 +12,34 @@ namespace projeto_dotnet_sql.Controllers
     public class TelefoneController : ControllerBase
     {
         private ITelefoneRepository? telefoneRepository;
+        private IProprietarioRepository? proprietarioRepository;
 
         public TelefoneController()
         {
             this.telefoneRepository = new TelefoneRepository(new ConcessionariaContext());
+            this.proprietarioRepository = new ProprietarioRepository(new ConcessionariaContext());
         }
 
         [HttpGet]
-        public IEnumerable<Telefone> GetTelefones()
+        public IEnumerable<TelefoneDTO> GetTelefones()
         {
-            return this.telefoneRepository!.GetTelefones();
+            var telefones = this.telefoneRepository!.GetTelefones();
+            var proprietarios = this.proprietarioRepository!.GetProprietarios();
+
+            var telefonesDTO = (
+                from telefone in telefones
+                join proprietario in proprietarios
+                on telefone.ProprietarioCpfCnpj equals proprietario.CpfCnpj
+
+                select new TelefoneDTO
+                {
+                    TelefoneId = telefone.TelefoneId,
+                    Proprietario = proprietario,
+                    Codigo = telefone.Codigo
+                }
+            );
+
+            return telefonesDTO;
         }
 
         [HttpGet("{id}")]

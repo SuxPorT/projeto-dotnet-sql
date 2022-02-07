@@ -45,13 +45,13 @@ namespace projeto_dotnet_sql.Migrations
                 columns: table => new
                 {
                     NumeroChassi = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProprietarioCpfCnpj = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Modelo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Ano = table.Column<int>(type: "int", maxLength: 30, nullable: false),
+                    Cor = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true),
                     Valor = table.Column<double>(type: "float", nullable: false),
                     Quilometragem = table.Column<double>(type: "float", nullable: false),
-                    Cor = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true),
-                    VersaoSistema = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
+                    VersaoSistema = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    ProprietarioCpfCnpj = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -65,7 +65,7 @@ namespace projeto_dotnet_sql.Migrations
                     VendedorId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nome = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    SalarioMinimo = table.Column<double>(type: "float", nullable: false)
+                    SalarioBase = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -98,7 +98,7 @@ namespace projeto_dotnet_sql.Migrations
                     VendaId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DataVenda = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ValorComissao = table.Column<double>(type: "float", nullable: false),
+                    ValorVenda = table.Column<double>(type: "float", nullable: false),
                     NumeroChassi = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     VendedorId = table.Column<int>(type: "int", nullable: false)
                 },

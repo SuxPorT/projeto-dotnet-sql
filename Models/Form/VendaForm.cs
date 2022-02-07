@@ -9,17 +9,15 @@ namespace projeto_dotnet_sql.Models.Form
         public DateTime DataVenda { get; set; }
 
         [Required]
-        public double ValorComissao { get; set; }
+        public double ValorVenda { get; set; }
 
         [Required]
         [ForeignKey("Veiculo")]
         public string? NumeroChassi { get; set; }
-        public Veiculo? Veiculo { get; set; }
 
         [Required]
         [ForeignKey("Vendedor")]
         public int VendedorId { get; set; }
-        public Vendedor? Vendedor { get; set; }
 
         public VendaForm() { }
 
@@ -28,11 +26,9 @@ namespace projeto_dotnet_sql.Models.Form
             return new Venda
             {
                 DataVenda = this.DataVenda,
-                ValorComissao = this.ValorComissao,
+                ValorVenda = this.ValorVenda,
                 NumeroChassi = this.NumeroChassi,
-                Veiculo = this.Veiculo,
                 VendedorId = this.VendedorId,
-                Vendedor = this.Vendedor
             };
         }
     }
