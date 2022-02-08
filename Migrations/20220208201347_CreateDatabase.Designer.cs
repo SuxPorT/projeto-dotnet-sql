@@ -12,7 +12,7 @@ using projeto_dotnet_sql.Models;
 namespace projeto_dotnet_sql.Migrations
 {
     [DbContext(typeof(ConcessionariaContext))]
-    [Migration("20220207013031_CreateDatabase")]
+    [Migration("20220208201347_CreateDatabase")]
     partial class CreateDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,7 +37,14 @@ namespace projeto_dotnet_sql.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("VeiculoNumeroChassi")
+                        .IsRequired()
+                        .HasMaxLength(17)
+                        .HasColumnType("nvarchar(17)");
+
                     b.HasKey("AcessorioId");
+
+                    b.HasIndex("VeiculoNumeroChassi");
 
                     b.ToTable("Acessorios");
                 });
@@ -45,18 +52,22 @@ namespace projeto_dotnet_sql.Migrations
             modelBuilder.Entity("projeto_dotnet_sql.Models.Proprietario", b =>
                 {
                     b.Property<string>("CpfCnpj")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("CEP")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Cidade")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("DataNascimento")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -66,11 +77,13 @@ namespace projeto_dotnet_sql.Migrations
                         .HasColumnType("nvarchar(1)");
 
                     b.Property<string>("Nome")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("UF")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
 
                     b.HasKey("CpfCnpj");
 
@@ -91,7 +104,8 @@ namespace projeto_dotnet_sql.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("ProprietarioCpfCnpj")
-                        .HasColumnType("nvarchar(450)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("TelefoneId");
 
@@ -103,10 +117,10 @@ namespace projeto_dotnet_sql.Migrations
             modelBuilder.Entity("projeto_dotnet_sql.Models.Veiculo", b =>
                 {
                     b.Property<string>("NumeroChassi")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(17)
+                        .HasColumnType("nvarchar(17)");
 
                     b.Property<int>("Ano")
-                        .HasMaxLength(30)
                         .HasColumnType("int");
 
                     b.Property<string>("Cor")
@@ -119,6 +133,7 @@ namespace projeto_dotnet_sql.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ProprietarioCpfCnpj")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Quilometragem")
@@ -147,19 +162,20 @@ namespace projeto_dotnet_sql.Migrations
                     b.Property<DateTime>("DataVenda")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("NumeroChassi")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<double>("ValorVenda")
                         .HasColumnType("float");
+
+                    b.Property<string>("VeiculoNumeroChassi")
+                        .IsRequired()
+                        .HasMaxLength(17)
+                        .HasColumnType("nvarchar(17)");
 
                     b.Property<int>("VendedorId")
                         .HasColumnType("int");
 
                     b.HasKey("VendaId");
 
-                    b.HasIndex("NumeroChassi");
+                    b.HasIndex("VeiculoNumeroChassi");
 
                     b.HasIndex("VendedorId");
 
@@ -187,18 +203,29 @@ namespace projeto_dotnet_sql.Migrations
                     b.ToTable("Vendedores");
                 });
 
+            modelBuilder.Entity("projeto_dotnet_sql.Models.Acessorio", b =>
+                {
+                    b.HasOne("projeto_dotnet_sql.Models.Veiculo", null)
+                        .WithMany("Acessorios")
+                        .HasForeignKey("VeiculoNumeroChassi")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("projeto_dotnet_sql.Models.Telefone", b =>
                 {
                     b.HasOne("projeto_dotnet_sql.Models.Proprietario", null)
                         .WithMany("Telefones")
-                        .HasForeignKey("ProprietarioCpfCnpj");
+                        .HasForeignKey("ProprietarioCpfCnpj")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("projeto_dotnet_sql.Models.Venda", b =>
                 {
                     b.HasOne("projeto_dotnet_sql.Models.Veiculo", "Veiculo")
                         .WithMany()
-                        .HasForeignKey("NumeroChassi")
+                        .HasForeignKey("VeiculoNumeroChassi")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -216,6 +243,11 @@ namespace projeto_dotnet_sql.Migrations
             modelBuilder.Entity("projeto_dotnet_sql.Models.Proprietario", b =>
                 {
                     b.Navigation("Telefones");
+                });
+
+            modelBuilder.Entity("projeto_dotnet_sql.Models.Veiculo", b =>
+                {
+                    b.Navigation("Acessorios");
                 });
 #pragma warning restore 612, 618
         }

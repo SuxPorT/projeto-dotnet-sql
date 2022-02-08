@@ -1,9 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace projeto_dotnet_sql.Models.Form
 {
     public class TelefoneForm
     {
+        [ForeignKey("ProprietarioCpfCnpj")]
+        [Required(ErrorMessage = "O campo \"proprietarioCpfCnpj\" é necessário")]
         public string? ProprietarioCpfCnpj { get; set; }
 
         [Required(ErrorMessage = "O campo \"codigo\" é necessário")]

@@ -1,5 +1,8 @@
+# Project directories
 bin/
 obj/
+Logs/
+
 *.swp
 *.*~
 project.lock.json

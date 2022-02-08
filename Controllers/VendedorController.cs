@@ -1,5 +1,6 @@
-using Exceptions;
+using CustomExceptions;
 using Microsoft.AspNetCore.Mvc;
+using projeto_dotnet_sql.Controllers.DTO;
 using projeto_dotnet_sql.DAL;
 using projeto_dotnet_sql.DAL.Interfaces;
 using projeto_dotnet_sql.Models;
@@ -24,24 +25,33 @@ namespace projeto_dotnet_sql.Controllers
         [HttpGet]
         public IEnumerable<VendedorDTO> GetVendedores()
         {
-            var vendedores = this.vendedorRepository!.GetVendedores();
-            var vendas = this.vendaRepository!.GetVendas();
+            try
+            {
+                var vendedores = this.vendedorRepository!.GetVendedores();
+                var vendas = this.vendaRepository!.GetVendas();
 
-            var vendedorDTO = (
-                from vendedor in vendedores
-                join venda in vendas
-                on vendedor.VendedorId equals venda.VendedorId
+                var vendedorDTO = (
+                    from vendedor in vendedores
+                    join venda in vendas
+                    on vendedor.VendedorId equals venda.VendedorId
 
-                select new VendedorDTO
-                {
-                    VendedorId = vendedor.VendedorId,
-                    Nome = vendedor.Nome,
-                    SalarioBase = vendedor.SalarioBase + venda.ValorVenda * 0.01,
-                    Vendas = vendas.Where(v => v.VendedorId == vendedor.VendedorId).ToList()
-                }
-            );
+                    select new VendedorDTO
+                    {
+                        VendedorId = vendedor.VendedorId,
+                        Nome = vendedor.Nome,
+                        SalarioBase = vendedor.SalarioBase + venda.ValorVenda * 0.01,
+                        Vendas = vendas.Where(v => v.VendedorId == vendedor.VendedorId).ToList()
+                    }
+                );
 
-            return vendedorDTO;
+                return vendedorDTO;
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Vendedor).Name, e);
+
+                return new HashSet<VendedorDTO>();
+            }
         }
 
         [HttpGet("{id}")]
@@ -60,9 +70,15 @@ namespace projeto_dotnet_sql.Controllers
             }
             catch (NotFoundException e)
             {
-                e.CriarLog();
+                LogException.CriarLog(typeof(Vendedor).Name, e);
 
                 return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Vendedor).Name, e);
+
+                return BadRequest("Erro não especificado");
             }
         }
 
@@ -73,7 +89,7 @@ namespace projeto_dotnet_sql.Controllers
             {
                 if (form is null)
                 {
-                    throw new BadRequestException(typeof(VendedorForm).Name, "O formulário está vazio");
+                    throw new BadRequestException(typeof(VendedorForm).Name, "O formulário está inválido");
                 }
 
                 this.vendedorRepository!.InsertVendedor(form.ToVendedor());
@@ -84,11 +100,16 @@ namespace projeto_dotnet_sql.Controllers
             }
             catch (BadRequestException e)
             {
-                e.CriarLog();
+                LogException.CriarLog(typeof(VendedorForm).Name, e);
 
-                return BadRequest();
+                return BadRequest(e.Message);
             }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Vendedor).Name, e);
 
+                return BadRequest("Erro não especificado");
+            }
         }
 
         [HttpPut("{id}")]
@@ -96,16 +117,16 @@ namespace projeto_dotnet_sql.Controllers
         {
             try
             {
-                if (form is null)
-                {
-                    throw new BadRequestException(typeof(VendedorForm).Name, "O formulário está vazio");
-                }
-
                 var vendedor = this.vendedorRepository!.GetVendedorPorID(id);
 
                 if (vendedor is null)
                 {
                     throw new NotFoundException(typeof(Vendedor).Name, $"Vendedor com o id \"{id}\" não foi encontrado");
+                }
+
+                if (form is null)
+                {
+                    throw new BadRequestException(typeof(VendedorForm).Name, "O formulário está inválido");
                 }
 
                 this.vendedorRepository.UpdateVendedor(vendedor, form);
@@ -114,17 +135,23 @@ namespace projeto_dotnet_sql.Controllers
 
                 return Ok(vendedor);
             }
-            catch (BadRequestException e)
-            {
-                e.CriarLog();
-
-                return BadRequest();
-            }
             catch (NotFoundException e)
             {
-                e.CriarLog();
+                LogException.CriarLog(typeof(Vendedor).Name, e);
 
                 return NotFound(e.Message);
+            }
+            catch (BadRequestException e)
+            {
+                LogException.CriarLog(typeof(VendedorForm).Name, e);
+
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Vendedor).Name, e);
+
+                return BadRequest("Erro não especificado");
             }
         }
 
@@ -142,13 +169,19 @@ namespace projeto_dotnet_sql.Controllers
 
                 this.vendedorRepository.DeleteVendedor(id);
 
-                return Accepted();
+                return NoContent();
             }
             catch (NotFoundException e)
             {
-                e.CriarLog();
+                LogException.CriarLog(typeof(Vendedor).Name, e);
 
                 return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Vendedor).Name, e);
+
+                return BadRequest("Erro não especificado");
             }
         }
     }

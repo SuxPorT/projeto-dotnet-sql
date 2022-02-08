@@ -10,30 +10,17 @@ namespace projeto_dotnet_sql.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Acessorios",
-                columns: table => new
-                {
-                    AcessorioId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Descricao = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Acessorios", x => x.AcessorioId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Proprietarios",
                 columns: table => new
                 {
-                    CpfCnpj = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CpfCnpj = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     IndicadorPessoa = table.Column<string>(type: "nvarchar(1)", maxLength: 1, nullable: false),
-                    Nome = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Nome = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     DataNascimento = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Cidade = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UF = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CEP = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Cidade = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    UF = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: true),
+                    CEP = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -44,14 +31,14 @@ namespace projeto_dotnet_sql.Migrations
                 name: "Veiculos",
                 columns: table => new
                 {
-                    NumeroChassi = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    NumeroChassi = table.Column<string>(type: "nvarchar(17)", maxLength: 17, nullable: false),
                     Modelo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Ano = table.Column<int>(type: "int", maxLength: 30, nullable: false),
+                    Ano = table.Column<int>(type: "int", nullable: false),
                     Cor = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true),
                     Valor = table.Column<double>(type: "float", nullable: false),
                     Quilometragem = table.Column<double>(type: "float", nullable: false),
                     VersaoSistema = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    ProprietarioCpfCnpj = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ProprietarioCpfCnpj = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -78,7 +65,7 @@ namespace projeto_dotnet_sql.Migrations
                 {
                     TelefoneId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ProprietarioCpfCnpj = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ProprietarioCpfCnpj = table.Column<string>(type: "nvarchar(20)", nullable: false),
                     Codigo = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
@@ -88,7 +75,28 @@ namespace projeto_dotnet_sql.Migrations
                         name: "FK_Telefones_Proprietarios_ProprietarioCpfCnpj",
                         column: x => x.ProprietarioCpfCnpj,
                         principalTable: "Proprietarios",
-                        principalColumn: "CpfCnpj");
+                        principalColumn: "CpfCnpj",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Acessorios",
+                columns: table => new
+                {
+                    AcessorioId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    VeiculoNumeroChassi = table.Column<string>(type: "nvarchar(17)", maxLength: 17, nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Acessorios", x => x.AcessorioId);
+                    table.ForeignKey(
+                        name: "FK_Acessorios_Veiculos_VeiculoNumeroChassi",
+                        column: x => x.VeiculoNumeroChassi,
+                        principalTable: "Veiculos",
+                        principalColumn: "NumeroChassi",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -99,15 +107,15 @@ namespace projeto_dotnet_sql.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DataVenda = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ValorVenda = table.Column<double>(type: "float", nullable: false),
-                    NumeroChassi = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    VeiculoNumeroChassi = table.Column<string>(type: "nvarchar(17)", maxLength: 17, nullable: false),
                     VendedorId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Vendas", x => x.VendaId);
                     table.ForeignKey(
-                        name: "FK_Vendas_Veiculos_NumeroChassi",
-                        column: x => x.NumeroChassi,
+                        name: "FK_Vendas_Veiculos_VeiculoNumeroChassi",
+                        column: x => x.VeiculoNumeroChassi,
                         principalTable: "Veiculos",
                         principalColumn: "NumeroChassi",
                         onDelete: ReferentialAction.Cascade);
@@ -120,14 +128,19 @@ namespace projeto_dotnet_sql.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Acessorios_VeiculoNumeroChassi",
+                table: "Acessorios",
+                column: "VeiculoNumeroChassi");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Telefones_ProprietarioCpfCnpj",
                 table: "Telefones",
                 column: "ProprietarioCpfCnpj");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Vendas_NumeroChassi",
+                name: "IX_Vendas_VeiculoNumeroChassi",
                 table: "Vendas",
-                column: "NumeroChassi");
+                column: "VeiculoNumeroChassi");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Vendas_VendedorId",

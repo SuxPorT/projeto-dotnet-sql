@@ -1,3 +1,4 @@
+using CustomExceptions;
 using Microsoft.AspNetCore.Mvc;
 using projeto_dotnet_sql.Controllers.DTO;
 using projeto_dotnet_sql.DAL;
@@ -25,99 +26,174 @@ namespace projeto_dotnet_sql.Controllers
         [HttpGet]
         public IEnumerable<VendaDTO> GetVendas()
         {
-            var vendas = this.vendaRepository!.GetVendas();
-            var veiculos = this.veiculoRepository!.GetVeiculos();
-            var vendedores = this.vendedorRepository!.GetVendedores();
+            try
+            {
+                var vendas = this.vendaRepository!.GetVendas();
+                var veiculos = this.veiculoRepository!.GetVeiculos();
+                var vendedores = this.vendedorRepository!.GetVendedores();
 
-            var vendaDTO = (
-                from venda in vendas
-                join veiculo in veiculos
-                on venda.NumeroChassi equals veiculo.NumeroChassi
-                join vendedor in vendedores
-                on venda.VendedorId equals vendedor.VendedorId
+                var vendaDTO = (
+                    from venda in vendas
+                    join veiculo in veiculos
+                    on venda.VeiculoNumeroChassi equals veiculo.NumeroChassi
+                    join vendedor in vendedores
+                    on venda.VendedorId equals vendedor.VendedorId
 
-                select new VendaDTO
-                {
-                    VendaId = venda.VendaId,
-                    DataVenda = venda.DataVenda,
-                    ValorVenda = veiculo.Valor,
-                    Veiculo = veiculo,
-                    Vendedor = vendedor
-                }
-            );
+                    select new VendaDTO
+                    {
+                        VendaId = venda.VendaId,
+                        DataVenda = venda.DataVenda,
+                        ValorVenda = veiculo.Valor,
+                        Veiculo = veiculo,
+                        Vendedor = vendedor
+                    }
+                );
 
-            return vendaDTO;
+                return vendaDTO;
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Venda).Name, e);
+
+                return new HashSet<VendaDTO>();
+            }
         }
 
         [HttpGet("{id}")]
         public IActionResult GetVendaPorID(int id)
         {
-            var venda = this.vendaRepository!.GetVendaPorID(id);
-
-            if (venda is null)
+            try
             {
-                return NotFound($"Venda com o id \"{id}\" não foi encontrada");
+                var venda = this.vendaRepository!.GetVendaPorID(id);
+
+                if (venda is null)
+                {
+                    throw new NotFoundException(typeof(Venda).Name, $"Venda com o id \"{id}\" não foi encontrada");
+                }
+
+                var veiculos = this.veiculoRepository!.GetVeiculos();
+                var vendedores = this.vendedorRepository!.GetVendedores();
+
+                venda.Veiculo = veiculos.Where(v => v.NumeroChassi == venda.VeiculoNumeroChassi).ToList()[0];
+                venda.Vendedor = vendedores.Where(v => v.VendedorId == venda.VendedorId).ToList()[0];
+
+                return Ok(venda);
             }
+            catch (NotFoundException e)
+            {
+                LogException.CriarLog(typeof(Venda).Name, e);
 
-            var veiculos = this.veiculoRepository!.GetVeiculos();
-            var vendedores = this.vendedorRepository!.GetVendedores();
+                return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Venda).Name, e);
 
-            venda.Veiculo = veiculos.Where(v => v.NumeroChassi == venda.NumeroChassi).ToList()[0];
-            venda.Vendedor = vendedores.Where(v => v.VendedorId == venda.VendedorId).ToList()[0];
-
-            return Ok(venda);
+                return BadRequest("Erro não especificado");
+            }
         }
 
         [HttpPost]
         public IActionResult PostVenda([FromBody] VendaForm form)
         {
-            if (form is null)
+            try
             {
-                return BadRequest();
+                if (form is null)
+                {
+                    throw new BadRequestException(typeof(VendaForm).Name, "O formulário está inválido");
+                }
+
+                this.vendaRepository!.InsertVenda(form.ToVenda());
+
+                var venda = this.vendaRepository.GetUltimaVenda();
+
+                return Ok(venda);
             }
+            catch (BadRequestException e)
+            {
+                LogException.CriarLog(typeof(VendaForm).Name, e);
 
-            this.vendaRepository!.InsertVenda(form.ToVenda());
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(VendaForm).Name, e);
 
-            var venda = this.vendaRepository.GetUltimaVenda();
-
-            return Ok(venda);
+                return BadRequest("Erro não especificado");
+            }
         }
 
         [HttpPut("{id}")]
         public IActionResult UpdateVendedor(int id, [FromBody] VendaForm form)
         {
-            if (form is null)
+            try
             {
-                return BadRequest();
+                var venda = this.vendaRepository!.GetVendaPorID(id);
+
+                if (venda is null)
+                {
+                    throw new NotFoundException(typeof(Venda).Name, $"Venda com o id \"{id}\" não foi encontrada");
+                }
+
+                if (form is null)
+                {
+                    throw new BadRequestException(typeof(VendaForm).Name, "O formulário está inválido");
+                }
+
+                this.vendaRepository.UpdateVenda(venda, form);
+
+                venda = this.vendaRepository.GetVendaPorID(id);
+
+                return Ok(venda);
             }
-
-            var venda = this.vendaRepository!.GetVendaPorID(id);
-
-            if (venda is null)
+            catch (NotFoundException e)
             {
-                return NotFound($"Venda com o id \"{id}\" não foi encontrado");
+                LogException.CriarLog(typeof(Venda).Name, e);
+
+                return NotFound(e.Message);
             }
+            catch (BadRequestException e)
+            {
+                LogException.CriarLog(typeof(VendaForm).Name, e);
 
-            this.vendaRepository.UpdateVenda(venda, form);
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Venda).Name, e);
 
-            venda = this.vendaRepository.GetVendaPorID(id);
-
-            return Ok(venda);
+                return BadRequest("Erro não especificado");
+            }
         }
 
         [HttpDelete("{id}")]
         public IActionResult DeleteVenda(int id)
         {
-            var venda = this.vendaRepository!.GetVendaPorID(id);
-
-            if (venda is null)
+            try
             {
-                return NotFound($"Venda com o id \"{id}\" não foi encontrado");
+                var venda = this.vendaRepository!.GetVendaPorID(id);
+
+                if (venda is null)
+                {
+                    throw new NotFoundException(typeof(Venda).Name, $"Venda com o id \"{id}\" não foi encontrada");
+                }
+
+                this.vendaRepository.DeleteVenda(id);
+
+                return NoContent();
             }
+            catch (NotFoundException e)
+            {
+                LogException.CriarLog(typeof(Venda).Name, e);
 
-            this.vendaRepository.DeleteVenda(id);
+                return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Venda).Name, e);
 
-            return Accepted();
+                return BadRequest("Erro não especificado");
+            }
         }
     }
 }

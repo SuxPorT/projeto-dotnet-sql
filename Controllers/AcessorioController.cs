@@ -1,3 +1,4 @@
+using CustomExceptions;
 using Microsoft.AspNetCore.Mvc;
 using projeto_dotnet_sql.DAL;
 using projeto_dotnet_sql.DAL.Interfaces;
@@ -20,72 +21,147 @@ namespace projeto_dotnet_sql.Controllers
         [HttpGet]
         public IEnumerable<Acessorio> GetAcessorios()
         {
-            return this.acessorioRepository!.GetAcessorios();
+            try
+            {
+                return this.acessorioRepository!.GetAcessorios();
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Acessorio).Name, e);
+
+                return new HashSet<Acessorio>();
+            }
         }
 
         [HttpGet("{id}")]
         public IActionResult GetAcessorioPorID(int id)
         {
-            var acessorio = this.acessorioRepository!.GetAcessorioPorID(id);
-
-            if (acessorio is null)
+            try
             {
-                return NotFound($"Acessório com o id \"{id}\" não foi encontrado");
-            }
+                var acessorio = this.acessorioRepository!.GetAcessorioPorID(id);
 
-            return Ok(acessorio);
+                if (acessorio is null)
+                {
+                    throw new NotFoundException(typeof(Acessorio).Name, $"Acessório com o id \"{id}\" não foi encontrado");
+                }
+
+                return Ok(acessorio);
+            }
+            catch (NotFoundException e)
+            {
+                LogException.CriarLog(typeof(Acessorio).Name, e);
+
+                return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Acessorio).Name, e);
+
+                return BadRequest("Erro não especificado");
+            }
         }
 
         [HttpPost]
         public IActionResult PostAcessorio([FromBody] AcessorioForm form)
         {
-            if (form is null)
+            try
             {
-                return BadRequest();
+                if (form is null)
+                {
+                    throw new BadRequestException(typeof(AcessorioForm).Name, "O formulário está inválido");
+                }
+
+                this.acessorioRepository!.InsertAcessorio(form.ToAcessorio());
+
+                var acessorio = this.acessorioRepository.GetUltimoAcessorio();
+
+                return Ok(acessorio);
             }
+            catch (BadRequestException e)
+            {
+                LogException.CriarLog(typeof(AcessorioForm).Name, e);
 
-            this.acessorioRepository!.InsertAcessorio(form.ToAcessorio());
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(AcessorioForm).Name, e);
 
-            var acessorio = this.acessorioRepository.GetUltimoAcessorio();
-
-            return Ok(acessorio);
+                return BadRequest("Erro não especificado");
+            }
         }
 
         [HttpPut("{id}")]
         public IActionResult UpdateAcessorio(int id, [FromBody] AcessorioForm form)
         {
-            if (form is null)
+            try
             {
-                return BadRequest();
+                var acessorio = this.acessorioRepository!.GetAcessorioPorID(id);
+
+                if (acessorio is null)
+                {
+                    throw new NotFoundException(typeof(Acessorio).Name, $"Acessório com o id \"{id}\" não foi encontrado");
+                }
+
+                if (form is null)
+                {
+                    throw new BadRequestException(typeof(AcessorioForm).Name, "O formulário está inválido");
+                }
+
+                this.acessorioRepository.UpdateAcessorio(acessorio, form);
+
+                acessorio = this.acessorioRepository.GetAcessorioPorID(id);
+
+                return Ok(acessorio);
             }
-
-            var acessorio = this.acessorioRepository!.GetAcessorioPorID(id);
-
-            if (acessorio is null)
+            catch (NotFoundException e)
             {
-                return NotFound($"Acessório com o id \"{id}\" não foi encontrado");
+                LogException.CriarLog(typeof(Acessorio).Name, e);
+
+                return NotFound(e.Message);
             }
+            catch (BadRequestException e)
+            {
+                LogException.CriarLog(typeof(AcessorioForm).Name, e);
 
-            this.acessorioRepository.UpdateAcessorio(acessorio, form);
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Acessorio).Name, e);
 
-            acessorio = this.acessorioRepository.GetAcessorioPorID(id);
-
-            return Ok(acessorio);
+                return BadRequest("Erro não especificado");
+            }
         }
 
         [HttpDelete("{id}")]
         public IActionResult DeleteAcessorio(int id)
         {
-            var acessorio = this.acessorioRepository!.GetAcessorioPorID(id);
-
-            if (acessorio is null)
+            try
             {
-                return NotFound($"Acessório com o id \"{id}\" não foi encontrado");
+                var acessorio = this.acessorioRepository!.GetAcessorioPorID(id);
+
+                if (acessorio is null)
+                {
+                    throw new NotFoundException(typeof(Acessorio).Name, $"Acessório com o id \"{id}\" não foi encontrado");
+                }
+
+                this.acessorioRepository.DeleteAcessorio(id);
+
+                return NoContent();
             }
+            catch (NotFoundException e)
+            {
+                LogException.CriarLog(typeof(Acessorio).Name, e);
 
-            this.acessorioRepository.DeleteAcessorio(id);
+                return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Acessorio).Name, e);
 
-            return Accepted();
+                return BadRequest("Erro não especificado");
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-namespace Exceptions
+namespace CustomExceptions
 {
     public class NotFoundException : LogException
     {
@@ -6,13 +6,11 @@ namespace Exceptions
 
         public NotFoundException(string entity, string message) : base(entity, message)
         {
-            Entity = entity;
         }
 
         public NotFoundException(string entity, string message, Exception inner)
         : base(entity, message, inner)
         {
-            Entity = entity;
         }
     }
 }

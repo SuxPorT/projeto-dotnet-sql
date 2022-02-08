@@ -1,3 +1,4 @@
+using CustomExceptions;
 using Microsoft.AspNetCore.Mvc;
 using projeto_dotnet_sql.DAL;
 using projeto_dotnet_sql.DAL.Interfaces;
@@ -23,88 +24,163 @@ namespace projeto_dotnet_sql.Controllers
         [HttpGet]
         public IEnumerable<TelefoneDTO> GetTelefones()
         {
-            var telefones = this.telefoneRepository!.GetTelefones();
-            var proprietarios = this.proprietarioRepository!.GetProprietarios();
+            try
+            {
+                var telefones = this.telefoneRepository!.GetTelefones();
+                var proprietarios = this.proprietarioRepository!.GetProprietarios();
 
-            var telefonesDTO = (
-                from telefone in telefones
-                join proprietario in proprietarios
-                on telefone.ProprietarioCpfCnpj equals proprietario.CpfCnpj
+                var telefonesDTO = (
+                    from telefone in telefones
+                    join proprietario in proprietarios
+                    on telefone.ProprietarioCpfCnpj equals proprietario.CpfCnpj
 
-                select new TelefoneDTO
-                {
-                    TelefoneId = telefone.TelefoneId,
-                    Proprietario = proprietario,
-                    Codigo = telefone.Codigo
-                }
-            );
+                    select new TelefoneDTO
+                    {
+                        TelefoneId = telefone.TelefoneId,
+                        Proprietario = proprietario,
+                        Codigo = telefone.Codigo
+                    }
+                );
 
-            return telefonesDTO;
+                return telefonesDTO;
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Telefone).Name, e);
+
+                return new HashSet<TelefoneDTO>();
+            }
         }
 
         [HttpGet("{id}")]
         public IActionResult GetTelefonePorID(int id)
         {
-            var telefone = this.telefoneRepository!.GetTelefonePorID(id);
-
-            if (telefone is null)
+            try
             {
-                return NotFound($"Telefone com o id \"{id}\" não foi encontrado");
-            }
+                var telefone = this.telefoneRepository!.GetTelefonePorID(id);
 
-            return Ok(telefone);
+                if (telefone is null)
+                {
+                    throw new NotFoundException(typeof(Telefone).Name, $"Telefone com o id \"{id}\" não foi encontrado");
+                }
+
+                return Ok(telefone);
+            }
+            catch (NotFoundException e)
+            {
+                LogException.CriarLog(typeof(Telefone).Name, e);
+
+                return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Telefone).Name, e);
+
+                return BadRequest("Erro não especificado");
+            }
         }
 
         [HttpPost]
         public IActionResult PostTelefone([FromBody] TelefoneForm form)
         {
-            if (form is null)
+            try
             {
-                return BadRequest();
+                if (form is null)
+                {
+                    throw new BadRequestException(typeof(TelefoneForm).Name, "O formulário está inválido");
+                }
+
+                this.telefoneRepository!.InsertTelefone(form.ToTelefone());
+
+                var telefone = this.telefoneRepository.GetUltimoTelefone();
+
+                return Ok(telefone);
             }
+            catch (BadRequestException e)
+            {
+                LogException.CriarLog(typeof(TelefoneForm).Name, e);
 
-            this.telefoneRepository!.InsertTelefone(form.ToTelefone());
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(TelefoneForm).Name, e);
 
-            var telefone = this.telefoneRepository.GetUltimoTelefone();
-
-            return Ok(telefone);
+                return BadRequest("Erro não especificado");
+            }
         }
 
         [HttpPut("{id}")]
         public IActionResult UpdateTelefone(int id, [FromBody] TelefoneForm form)
         {
-            if (form is null)
+            try
             {
-                return BadRequest();
+                var telefone = this.telefoneRepository!.GetTelefonePorID(id);
+
+                if (telefone is null)
+                {
+                    throw new NotFoundException(typeof(Telefone).Name, $"Telefone com o id \"{id}\" não foi encontrado");
+                }
+
+                if (form is null)
+                {
+                    throw new BadRequestException(typeof(TelefoneForm).Name, "O formulário está inválido");
+                }
+
+                this.telefoneRepository.UpdateTelefone(telefone, form);
+
+                telefone = this.telefoneRepository.GetTelefonePorID(id);
+
+                return Ok(telefone);
             }
-
-            var telefone = this.telefoneRepository!.GetTelefonePorID(id);
-
-            if (telefone is null)
+            catch (NotFoundException e)
             {
-                return NotFound($"Telefone com o id \"{id}\" não foi encontrado");
+                LogException.CriarLog(typeof(Telefone).Name, e);
+
+                return NotFound(e.Message);
             }
+            catch (BadRequestException e)
+            {
+                LogException.CriarLog(typeof(TelefoneForm).Name, e);
 
-            this.telefoneRepository.UpdateTelefone(telefone, form);
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Telefone).Name, e);
 
-            telefone = this.telefoneRepository.GetTelefonePorID(id);
-
-            return Ok(telefone);
+                return BadRequest("Erro não especificado");
+            }
         }
 
         [HttpDelete("{id}")]
         public IActionResult DeleteTelefone(int id)
         {
-            var telefone = this.telefoneRepository!.GetTelefonePorID(id);
-
-            if (telefone is null)
+            try
             {
-                return NotFound($"Telefone com o id \"{id}\" não foi encontrado");
+                var telefone = this.telefoneRepository!.GetTelefonePorID(id);
+
+                if (telefone is null)
+                {
+                    throw new NotFoundException(typeof(Telefone).Name, $"Telefone com o id \"{id}\" não foi encontrado");
+                }
+
+                this.telefoneRepository.DeleteTelefone(id);
+
+                return NoContent();
             }
+            catch (NotFoundException e)
+            {
+                LogException.CriarLog(typeof(Telefone).Name, e);
 
-            this.telefoneRepository.DeleteTelefone(id);
+                return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                LogException.CriarLog(typeof(Telefone).Name, e);
 
-            return Accepted();
+                return BadRequest("Erro não especificado");
+            }
         }
     }
 }

@@ -27,7 +27,7 @@ namespace projeto_dotnet_sql.Models.DTO
         [MaxLength(10)]
         public string? VersaoSistema { get; set; } = null;
 
-        public Proprietario? Proprietario { get; set; }
+        public ProprietarioDTO? Proprietario { get; set; }
 
         public VeiculoDTO() { }
     }

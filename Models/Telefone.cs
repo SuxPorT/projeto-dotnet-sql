@@ -8,7 +8,8 @@ namespace projeto_dotnet_sql.Models
         [Key]
         public int TelefoneId { get; set; }
 
-        [ForeignKey("DocumentoProprietario")]
+        [ForeignKey("ProprietarioCpfCnpj")]
+        [Required(ErrorMessage = "O campo \"proprietarioCpfCnpj\" é necessário")]
         public string? ProprietarioCpfCnpj { get; set; }
 
         [Required(ErrorMessage = "O campo \"codigo\" é necessário")]
