@@ -50,28 +50,37 @@ namespace projeto_dotnet_sql.Controllers
         [HttpGet("{numeroChassi}")]
         public IActionResult GetVeiculoPorNumeroChassi(string numeroChassi)
         {
-            var veiculo = this.veiculoRepository!.GetVeiculoPorNumeroChassi(numeroChassi);
-
-            if (veiculo is null)
+            try
             {
-                return NotFound($"Veículo com o chassi \"{numeroChassi}\" não foi encontrado");
+                var veiculo = this.veiculoRepository!.GetVeiculoPorNumeroChassi(numeroChassi);
+
+                if (veiculo is null)
+                {
+                    return NotFound($"Veículo com o chassi \"{numeroChassi}\" não foi encontrado");
+                }
+
+                var proprietarios = this.proprietarioRepository!.GetProprietarios();
+
+                var veiculoDTO = new VeiculoDTO
+                {
+                    NumeroChassi = veiculo.NumeroChassi,
+                    Modelo = veiculo.Modelo,
+                    Ano = veiculo.Ano,
+                    Cor = veiculo.Cor,
+                    Valor = veiculo.Valor,
+                    Quilometragem = veiculo.Quilometragem,
+                    VersaoSistema = veiculo.VersaoSistema,
+                    Proprietario = proprietarios.Where(p => p.CpfCnpj == veiculo.ProprietarioCpfCnpj).ToList()[0]
+                };
+
+                return Ok(veiculoDTO);
             }
-
-            var proprietarios = this.proprietarioRepository!.GetProprietarios();
-
-            var veiculoDTO = new VeiculoDTO
+            catch (NotFoundException e)
             {
-                NumeroChassi = veiculo.NumeroChassi,
-                Modelo = veiculo.Modelo,
-                Ano = veiculo.Ano,
-                Cor = veiculo.Cor,
-                Valor = veiculo.Valor,
-                Quilometragem = veiculo.Quilometragem,
-                VersaoSistema = veiculo.VersaoSistema,
-                Proprietario = proprietarios.Where(p => p.CpfCnpj == veiculo.ProprietarioCpfCnpj).ToList()[0]
-            };
-
-            return Ok(veiculoDTO);
+                e.CriarLog();
+                
+                return NotFound(e.Message);
+            }
         }
 
         [HttpGet("busca")]
@@ -79,78 +88,120 @@ namespace projeto_dotnet_sql.Controllers
             [FromQuery(Name = "quilometragem")] string quilometragem,
             [FromQuery(Name = "versaoSistema")] string versaoSistema)
         {
-            if ((quilometragem == null && versaoSistema == null) || (quilometragem == "" && versaoSistema == ""))
+            try
             {
-                return BadRequest();
-            }
-
-            var veiculos = this.veiculoRepository!.GetVeiculos();
-            var resultado = new HashSet<Veiculo>();
-
-            foreach (var veiculo in veiculos)
-            {
-                if (veiculo.Quilometragem == Double.Parse(quilometragem!) && veiculo.VersaoSistema == versaoSistema)
+                if ((quilometragem == null && versaoSistema == null) || (quilometragem == "" && versaoSistema == ""))
                 {
-                    resultado.Add(veiculo);
+                    return BadRequest();
                 }
-            }
 
-            if (resultado.Count > 0)
+                var veiculos = this.veiculoRepository!.GetVeiculos();
+                var resultado = new HashSet<Veiculo>();
+
+                foreach (var veiculo in veiculos)
+                {
+                    if (veiculo.Quilometragem == Double.Parse(quilometragem!) && veiculo.VersaoSistema == versaoSistema)
+                    {
+                        resultado.Add(veiculo);
+                    }
+                }
+
+                if (resultado.Count > 0)
+                {
+                    return Ok(resultado);
+                }
+
+                return NotFound();
+            }
+            catch (NotFoundException e)
             {
-                return Ok(resultado);
-            }
+                e.CriarLog();
 
-            return NotFound();
+                return NotFound(e.Message);
+            }
         }
 
         [HttpPost]
         public IActionResult PostVeiculo([FromBody] VeiculoForm form)
         {
-            if (form is null)
+            try
             {
+                if (form is null)
+                {
+                    return BadRequest();
+                }
+
+                var veiculo = this.veiculoRepository!.InsertVeiculo(form.ToVeiculo());
+
+                return Ok(veiculo);
+            }
+            catch (BadRequestException e)
+            {
+                e.CriarLog();
+                
                 return BadRequest();
             }
-
-            var veiculo = this.veiculoRepository!.InsertVeiculo(form.ToVeiculo());
-
-            return Ok(veiculo);
         }
 
         [HttpPut("{numeroChassi}")]
         public IActionResult UpdateVeiculo(string numeroChassi, [FromBody] VeiculoForm form)
         {
-            if (form is null)
+            try
             {
+                if (form is null)
+                {
+                    return BadRequest();
+                }
+
+                var veiculo = this.veiculoRepository!.GetVeiculoPorNumeroChassi(numeroChassi);
+
+                if (veiculo is null)
+                {
+                    return NotFound($"Veículo com o chassi \"{numeroChassi}\" não foi encontrado");
+                }
+
+                this.veiculoRepository.UpdateVeiculo(veiculo, form);
+
+                veiculo = this.veiculoRepository.GetVeiculoPorNumeroChassi(numeroChassi);
+
+                return Ok(veiculo);
+            }
+            catch (BadRequestException e)
+            {
+                e.CriarLog();
+
                 return BadRequest();
             }
-
-            var veiculo = this.veiculoRepository!.GetVeiculoPorNumeroChassi(numeroChassi);
-
-            if (veiculo is null)
+            catch (NotFoundException e)
             {
-                return NotFound($"Veículo com o chassi \"{numeroChassi}\" não foi encontrado");
+                e.CriarLog();
+
+                return NotFound(e.Message);
             }
-
-            this.veiculoRepository.UpdateVeiculo(veiculo, form);
-
-            veiculo = this.veiculoRepository.GetVeiculoPorNumeroChassi(numeroChassi);
-
-            return Ok(veiculo);
         }
 
         [HttpDelete("{numeroChassi}")]
         public IActionResult DeleteVeiculo(string numeroChassi)
         {
-            var veiculo = this.veiculoRepository!.GetVeiculoPorNumeroChassi(numeroChassi);
-
-            if (veiculo is null)
+            try
             {
-                return NotFound($"Veículo com o chassi \"{numeroChassi}\" não foi encontrado");
+                var veiculo = this.veiculoRepository!.GetVeiculoPorNumeroChassi(numeroChassi);
+
+                if (veiculo is null)
+                {
+                    return NotFound($"Veículo com o chassi \"{numeroChassi}\" não foi encontrado");
+                }
+
+                this.veiculoRepository.DeleteVeiculo(numeroChassi);
+
+                return Accepted();
             }
+            catch (NotFoundException e)
+            {
+                e.CriarLog();
 
-            this.veiculoRepository.DeleteVeiculo(numeroChassi);
-
-            return Accepted();
+                return NotFound(e.Message);
+            }
         }
     }
 }
