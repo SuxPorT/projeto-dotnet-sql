@@ -50,79 +50,121 @@ namespace projeto_dotnet_sql.Controllers
         [HttpGet("{cpfCnpj}")]
         public IActionResult GetProprietarioPorID(string cpfCnpj)
         {
-            var proprietario = this.proprietarioRepository!.GetProprietarioPorCpfCnpj(cpfCnpj);
-
-            if (proprietario is null)
+            try
             {
-                return NotFound($"Proprietário com o documento \"{cpfCnpj}\" não foi encontrado");
+                var proprietario = this.proprietarioRepository!.GetProprietarioPorCpfCnpj(cpfCnpj);
+
+                if (proprietario is null)
+                {
+                    return NotFound($"Proprietário com o documento \"{cpfCnpj}\" não foi encontrado");
+                }
+
+                var telefones = this.telefoneRepository!.GetTelefones();
+
+                var proprietarioDTO = new ProprietarioDTO
+                {
+                    CpfCnpj = proprietario.CpfCnpj,
+                    IndicadorPessoa = proprietario.IndicadorPessoa,
+                    Nome = proprietario.Nome,
+                    Email = proprietario.Email,
+                    Telefones = telefones.Where(t => t.ProprietarioCpfCnpj == proprietario.CpfCnpj).ToList(),
+                    DataNascimento = proprietario.DataNascimento,
+                    Cidade = proprietario.Cidade,
+                    UF = proprietario.UF,
+                    CEP = proprietario.CEP
+                };
+
+                return Ok(proprietarioDTO);
             }
-
-            var telefones = this.telefoneRepository!.GetTelefones();
-
-            var proprietarioDTO = new ProprietarioDTO
+            catch (NotFoundException e)
             {
-                CpfCnpj = proprietario.CpfCnpj,
-                IndicadorPessoa = proprietario.IndicadorPessoa,
-                Nome = proprietario.Nome,
-                Email = proprietario.Email,
-                Telefones = telefones.Where(t => t.ProprietarioCpfCnpj == proprietario.CpfCnpj).ToList(),
-                DataNascimento = proprietario.DataNascimento,
-                Cidade = proprietario.Cidade,
-                UF = proprietario.UF,
-                CEP = proprietario.CEP
-            };
-
-            return Ok(proprietarioDTO);
+                e.CriarLog();
+                
+                return NotFound(e.Message);
+            }
         }
 
         [HttpPost]
         public IActionResult PostProprietario([FromBody] ProprietarioForm form)
         {
-            if (form is null)
+            try
             {
+                if (form is null)
+                {
+                    return BadRequest();
+                }
+
+                var proprietario = this.proprietarioRepository!.InsertProprietario(form.ToProprietario());
+
+                return Ok(proprietario);
+            }
+            catch (BadRequestException e)
+            {
+                e.CriarLog();
+                
                 return BadRequest();
             }
-
-            var proprietario = this.proprietarioRepository!.InsertProprietario(form.ToProprietario());
-
-            return Ok(proprietario);
         }
 
         [HttpPut("{cpfCnpj}")]
         public IActionResult UpdateProprietario(string cpfCnpj, [FromBody] ProprietarioForm form)
         {
-            if (form is null)
+            try
             {
+                if (form is null)
+                {
+                    return BadRequest();
+                }
+
+                var proprietario = this.proprietarioRepository!.GetProprietarioPorCpfCnpj(cpfCnpj);
+
+                if (proprietario is null)
+                {
+                    return NotFound($"Proprietário com o documento \"{cpfCnpj}\" não foi encontrado");
+                }
+
+                this.proprietarioRepository.UpdateProprietario(proprietario, form);
+
+                proprietario = this.proprietarioRepository.GetProprietarioPorCpfCnpj(cpfCnpj);
+
+                return Ok(proprietario);
+            }
+            catch (BadRequestException e)
+            {
+                e.CriarLog();
+                
                 return BadRequest();
             }
-
-            var proprietario = this.proprietarioRepository!.GetProprietarioPorCpfCnpj(cpfCnpj);
-
-            if (proprietario is null)
+            catch (NotFoundException e)
             {
-                return NotFound($"Proprietário com o documento \"{cpfCnpj}\" não foi encontrado");
+                e.CriarLog();
+                
+                return NotFound(e.Message);
             }
-
-            this.proprietarioRepository.UpdateProprietario(proprietario, form);
-
-            proprietario = this.proprietarioRepository.GetProprietarioPorCpfCnpj(cpfCnpj);
-
-            return Ok(proprietario);
         }
 
         [HttpDelete("{cpfCnpj}")]
         public IActionResult DeleteProprietario(string cpfCnpj)
         {
-            var proprietario = this.proprietarioRepository!.GetProprietarioPorCpfCnpj(cpfCnpj);
-
-            if (proprietario is null)
+            try
             {
-                return NotFound($"Proprietário com o documento \"{cpfCnpj}\" não foi encontrado");
+                var proprietario = this.proprietarioRepository!.GetProprietarioPorCpfCnpj(cpfCnpj);
+
+                if (proprietario is null)
+                {
+                    return NotFound($"Proprietário com o documento \"{cpfCnpj}\" não foi encontrado");
+                }
+
+                this.proprietarioRepository.DeleteProprietario(cpfCnpj);
+
+                    return Accepted();
             }
-
-            this.proprietarioRepository.DeleteProprietario(cpfCnpj);
-
-            return Accepted();
+            catch (NotFoundException e)
+            {
+                e.CriarLog();
+                
+                return NotFound(e.Message);
+            }
         }
     }
 }
