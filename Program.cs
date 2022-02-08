@@ -22,8 +22,8 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
-        Title = "Desenvolvimento de Back-End",
-        Description = "Serviço em REST desenvolvido na disciplina!",
+        Title = "Projeto .NET e SQL",
+        Description = "Projeto realizado durante a disciplina de Desenvolvimento em Aplicações, em parceria com a PUCPR e a Volvo.",
         Contact = new OpenApiContact
         {
             Name = "Adilson Reis, Alexys Santiago, Raphaela Vieira",
