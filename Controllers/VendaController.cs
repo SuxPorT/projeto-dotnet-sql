@@ -52,72 +52,115 @@ namespace projeto_dotnet_sql.Controllers
         [HttpGet("{id}")]
         public IActionResult GetVendaPorID(int id)
         {
-            var venda = this.vendaRepository!.GetVendaPorID(id);
-
-            if (venda is null)
+            try
             {
-                return NotFound($"Venda com o id \"{id}\" não foi encontrada");
+                var venda = this.vendaRepository!.GetVendaPorID(id);
+
+                if (venda is null)
+                {
+                    return NotFound($"Venda com o id \"{id}\" não foi encontrada");
+                }
+
+                var veiculos = this.veiculoRepository!.GetVeiculos();
+                var vendedores = this.vendedorRepository!.GetVendedores();
+
+                venda.Veiculo = veiculos.Where(v => v.NumeroChassi == venda.NumeroChassi).ToList()[0];
+                venda.Vendedor = vendedores.Where(v => v.VendedorId == venda.VendedorId).ToList()[0];
+
+                return Ok(venda);
             }
+            catch (NotFoundException e)
+            {
+                e.CriarLog();
 
-            var veiculos = this.veiculoRepository!.GetVeiculos();
-            var vendedores = this.vendedorRepository!.GetVendedores();
-
-            venda.Veiculo = veiculos.Where(v => v.NumeroChassi == venda.NumeroChassi).ToList()[0];
-            venda.Vendedor = vendedores.Where(v => v.VendedorId == venda.VendedorId).ToList()[0];
-
-            return Ok(venda);
+                return NotFound(e.Message);
+            }
         }
 
         [HttpPost]
         public IActionResult PostVenda([FromBody] VendaForm form)
         {
-            if (form is null)
+            try
             {
+                if (form is null)
+                {
+                    return BadRequest();
+                }
+
+                this.vendaRepository!.InsertVenda(form.ToVenda());
+
+                var venda = this.vendaRepository.GetUltimaVenda();
+
+                return Ok(venda);
+            }
+            catch (BadRequestException e)
+            {
+                e.CriarLog();
+
                 return BadRequest();
             }
-
-            this.vendaRepository!.InsertVenda(form.ToVenda());
-
-            var venda = this.vendaRepository.GetUltimaVenda();
-
-            return Ok(venda);
         }
 
         [HttpPut("{id}")]
         public IActionResult UpdateVendedor(int id, [FromBody] VendaForm form)
         {
-            if (form is null)
+            try
             {
+                if (form is null)
+                {
+                    return BadRequest();
+                }
+
+                var venda = this.vendaRepository!.GetVendaPorID(id);
+
+                if (venda is null)
+                {
+                    return NotFound($"Venda com o id \"{id}\" não foi encontrado");
+                }
+
+                this.vendaRepository.UpdateVenda(venda, form);
+
+                venda = this.vendaRepository.GetVendaPorID(id);
+
+                return Ok(venda);
+            }
+            catch (BadRequestException e)
+            {
+                e.CriarLog();
+
                 return BadRequest();
             }
-
-            var venda = this.vendaRepository!.GetVendaPorID(id);
-
-            if (venda is null)
+            catch (NotFoundException e)
             {
-                return NotFound($"Venda com o id \"{id}\" não foi encontrado");
+                e.CriarLog();
+
+                return NotFound(e.Message);
             }
-
-            this.vendaRepository.UpdateVenda(venda, form);
-
-            venda = this.vendaRepository.GetVendaPorID(id);
-
-            return Ok(venda);
+            
         }
 
         [HttpDelete("{id}")]
         public IActionResult DeleteVenda(int id)
         {
-            var venda = this.vendaRepository!.GetVendaPorID(id);
-
-            if (venda is null)
+            try
             {
-                return NotFound($"Venda com o id \"{id}\" não foi encontrado");
+                var venda = this.vendaRepository!.GetVendaPorID(id);
+
+                if (venda is null)
+                {
+                    return NotFound($"Venda com o id \"{id}\" não foi encontrado");
+                }
+
+                this.vendaRepository.DeleteVenda(id);
+
+                return Accepted();
             }
+            catch (NotFoundException e)
+            {
+                e.CriarLog();
 
-            this.vendaRepository.DeleteVenda(id);
-
-            return Accepted();
+                return NotFound(e.Message);
+            }
         }
     }
 }
