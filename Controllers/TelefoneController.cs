@@ -45,66 +45,108 @@ namespace projeto_dotnet_sql.Controllers
         [HttpGet("{id}")]
         public IActionResult GetTelefonePorID(int id)
         {
-            var telefone = this.telefoneRepository!.GetTelefonePorID(id);
-
-            if (telefone is null)
+            try
             {
-                return NotFound($"Telefone com o id \"{id}\" não foi encontrado");
-            }
+                var telefone = this.telefoneRepository!.GetTelefonePorID(id);
 
-            return Ok(telefone);
+                if (telefone is null)
+                {
+                    return NotFound($"Telefone com o id \"{id}\" não foi encontrado");
+                }
+
+                return Ok(telefone);
+            }
+            catch (NotFoundException e)
+            {
+                e.CriarLog();
+                
+                return NotFound(e.Message);
+            }
         }
 
         [HttpPost]
         public IActionResult PostTelefone([FromBody] TelefoneForm form)
         {
-            if (form is null)
+            try
             {
+                if (form is null)
+                {
+                    return BadRequest();
+                }
+
+                this.telefoneRepository!.InsertTelefone(form.ToTelefone());
+
+                var telefone = this.telefoneRepository.GetUltimoTelefone();
+
+                return Ok(telefone);
+            }
+            catch (BadRequestException e)
+            {
+                e.CriarLog();
+                
                 return BadRequest();
             }
-
-            this.telefoneRepository!.InsertTelefone(form.ToTelefone());
-
-            var telefone = this.telefoneRepository.GetUltimoTelefone();
-
-            return Ok(telefone);
         }
 
         [HttpPut("{id}")]
         public IActionResult UpdateTelefone(int id, [FromBody] TelefoneForm form)
         {
-            if (form is null)
+            try
             {
+                if (form is null)
+                {
+                    return BadRequest();
+                }
+
+                var telefone = this.telefoneRepository!.GetTelefonePorID(id);
+
+                if (telefone is null)
+                {
+                    return NotFound($"Telefone com o id \"{id}\" não foi encontrado");
+                }
+
+                this.telefoneRepository.UpdateTelefone(telefone, form);
+
+                telefone = this.telefoneRepository.GetTelefonePorID(id);
+
+                return Ok(telefone);
+            }
+            catch (BadRequestException e)
+            {
+                e.CriarLog();
+                
                 return BadRequest();
             }
-
-            var telefone = this.telefoneRepository!.GetTelefonePorID(id);
-
-            if (telefone is null)
+            catch (NotFoundException e)
             {
-                return NotFound($"Telefone com o id \"{id}\" não foi encontrado");
+                e.CriarLog();
+                
+                return NotFound(e.Message);
             }
-
-            this.telefoneRepository.UpdateTelefone(telefone, form);
-
-            telefone = this.telefoneRepository.GetTelefonePorID(id);
-
-            return Ok(telefone);
         }
 
         [HttpDelete("{id}")]
         public IActionResult DeleteTelefone(int id)
         {
-            var telefone = this.telefoneRepository!.GetTelefonePorID(id);
-
-            if (telefone is null)
+            try
             {
-                return NotFound($"Telefone com o id \"{id}\" não foi encontrado");
+                var telefone = this.telefoneRepository!.GetTelefonePorID(id);
+
+                if (telefone is null)
+                {
+                    return NotFound($"Telefone com o id \"{id}\" não foi encontrado");
+                }
+
+                this.telefoneRepository.DeleteTelefone(id);
+
+                return Accepted();
             }
-
-            this.telefoneRepository.DeleteTelefone(id);
-
-            return Accepted();
+            catch (NotFoundException e)
+            {
+                e.CriarLog();
+                
+                return NotFound(e.Message);
+            }
         }
     }
 }
