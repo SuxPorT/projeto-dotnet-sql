@@ -26,66 +26,109 @@ namespace projeto_dotnet_sql.Controllers
         [HttpGet("{id}")]
         public IActionResult GetAcessorioPorID(int id)
         {
-            var acessorio = this.acessorioRepository!.GetAcessorioPorID(id);
-
-            if (acessorio is null)
+            try
             {
-                return NotFound($"Acessório com o id \"{id}\" não foi encontrado");
-            }
+                var acessorio = this.acessorioRepository!.GetAcessorioPorID(id);
 
-            return Ok(acessorio);
+                if (acessorio is null)
+                {
+                    return NotFound($"Acessório com o id \"{id}\" não foi encontrado");
+                }
+
+                return Ok(acessorio);
+             }
+             catch (NotFoundException e)
+             {
+                e.CriarLog();
+                
+                return NotFound(e.Message);
+             }
+                
         }
 
         [HttpPost]
         public IActionResult PostAcessorio([FromBody] AcessorioForm form)
         {
-            if (form is null)
+            try
             {
+                if (form is null)
+                {
+                    return BadRequest();
+                }
+
+                this.acessorioRepository!.InsertAcessorio(form.ToAcessorio());
+
+                var acessorio = this.acessorioRepository.GetUltimoAcessorio();
+
+                return Ok(acessorio);
+            }
+            catch (BadRequestException e)
+            {
+                e.CriarLog();
+                
                 return BadRequest();
             }
-
-            this.acessorioRepository!.InsertAcessorio(form.ToAcessorio());
-
-            var acessorio = this.acessorioRepository.GetUltimoAcessorio();
-
-            return Ok(acessorio);
         }
 
         [HttpPut("{id}")]
         public IActionResult UpdateAcessorio(int id, [FromBody] AcessorioForm form)
         {
-            if (form is null)
+            try
             {
+                if (form is null)
+                {
+                    return BadRequest();
+                }
+
+                var acessorio = this.acessorioRepository!.GetAcessorioPorID(id);
+
+                if (acessorio is null)
+                {
+                    return NotFound($"Acessório com o id \"{id}\" não foi encontrado");
+                }
+
+                this.acessorioRepository.UpdateAcessorio(acessorio, form);
+
+                acessorio = this.acessorioRepository.GetAcessorioPorID(id);
+
+                return Ok(acessorio);
+            }
+            catch (BadRequestException e)
+            {
+                e.CriarLog();
+                
                 return BadRequest();
             }
-
-            var acessorio = this.acessorioRepository!.GetAcessorioPorID(id);
-
-            if (acessorio is null)
+            catch (NotFoundException e)
             {
-                return NotFound($"Acessório com o id \"{id}\" não foi encontrado");
+                e.CriarLog();
+                
+                return NotFound(e.Message);
             }
-
-            this.acessorioRepository.UpdateAcessorio(acessorio, form);
-
-            acessorio = this.acessorioRepository.GetAcessorioPorID(id);
-
-            return Ok(acessorio);
         }
 
         [HttpDelete("{id}")]
         public IActionResult DeleteAcessorio(int id)
         {
-            var acessorio = this.acessorioRepository!.GetAcessorioPorID(id);
-
-            if (acessorio is null)
+            try
             {
-                return NotFound($"Acessório com o id \"{id}\" não foi encontrado");
+                var acessorio = this.acessorioRepository!.GetAcessorioPorID(id);
+
+                if (acessorio is null)
+                {
+                    return NotFound($"Acessório com o id \"{id}\" não foi encontrado");
+                }
+
+                this.acessorioRepository.DeleteAcessorio(id);
+
+                return Accepted();
             }
-
-            this.acessorioRepository.DeleteAcessorio(id);
-
-            return Accepted();
+            catch (NotFoundException e)
+            {
+                e.CriarLog();
+           
+               return NotFound(e.Message);
+            }
         }
     }
 }
