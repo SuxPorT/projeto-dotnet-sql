@@ -15,7 +15,9 @@ namespace projeto_dotnet_sql.Controllers
 
         public AcessorioController()
         {
-            this.acessorioRepository = new AcessorioRepository(new ConcessionariaContext());
+            var concessionariaContext = new ConcessionariaContext();
+
+            this.acessorioRepository = new AcessorioRepository(concessionariaContext);
         }
 
         [HttpGet]

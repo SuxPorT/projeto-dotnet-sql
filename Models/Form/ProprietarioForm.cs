@@ -11,7 +11,7 @@ namespace projeto_dotnet_sql.Controllers.DTO
 
         [Required(ErrorMessage = "O campo \"indicadorPessoa\" é necessário")]
         [MaxLength(1, ErrorMessage = "O campo deve indicar \"F\" ou \"J")]
-        public char IndicadorPessoa { get; set; }
+        public string? IndicadorPessoa { get; set; }
 
         [Required(ErrorMessage = "O campo \"nome\" é necessário")]
         [MaxLength(50, ErrorMessage = "O nome deve ter no máximo 50 caracteres")]

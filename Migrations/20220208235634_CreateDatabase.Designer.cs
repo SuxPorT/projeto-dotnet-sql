@@ -12,7 +12,7 @@ using projeto_dotnet_sql.Models;
 namespace projeto_dotnet_sql.Migrations
 {
     [DbContext(typeof(ConcessionariaContext))]
-    [Migration("20220208201347_CreateDatabase")]
+    [Migration("20220208235634_CreateDatabase")]
     partial class CreateDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

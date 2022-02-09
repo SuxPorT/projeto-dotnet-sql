@@ -18,9 +18,11 @@ namespace projeto_dotnet_sql.Controllers
 
         public VendaController()
         {
-            this.vendaRepository = new VendaRepository(new ConcessionariaContext());
-            this.veiculoRepository = new VeiculoRepository(new ConcessionariaContext());
-            this.vendedorRepository = new VendedorRepository(new ConcessionariaContext());
+            var concessionariaContext = new ConcessionariaContext();
+
+            this.vendaRepository = new VendaRepository(concessionariaContext);
+            this.veiculoRepository = new VeiculoRepository(concessionariaContext);
+            this.vendedorRepository = new VendedorRepository(concessionariaContext);
         }
 
         [HttpGet]

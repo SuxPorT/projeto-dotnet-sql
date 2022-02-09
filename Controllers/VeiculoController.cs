@@ -19,10 +19,12 @@ namespace projeto_dotnet_sql.Controllers
 
         public VeiculoController()
         {
-            this.veiculoRepository = new VeiculoRepository(new ConcessionariaContext());
-            this.proprietarioRepository = new ProprietarioRepository(new ConcessionariaContext());
-            this.telefoneRepository = new TelefoneRepository(new ConcessionariaContext());
-            this.acessorioRepository = new AcessorioRepository(new ConcessionariaContext());
+            var concessionariaContext = new ConcessionariaContext();
+
+            this.veiculoRepository = new VeiculoRepository(concessionariaContext);
+            this.proprietarioRepository = new ProprietarioRepository(concessionariaContext);
+            this.telefoneRepository = new TelefoneRepository(concessionariaContext);
+            this.acessorioRepository = new AcessorioRepository(concessionariaContext);
         }
 
         [HttpGet]

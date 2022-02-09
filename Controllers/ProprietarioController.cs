@@ -17,8 +17,10 @@ namespace projeto_dotnet_sql.Controllers
 
         public ProprietarioController()
         {
-            this.proprietarioRepository = new ProprietarioRepository(new ConcessionariaContext());
-            this.telefoneRepository = new TelefoneRepository(new ConcessionariaContext());
+            var concessionariaContext = new ConcessionariaContext();
+
+            this.proprietarioRepository = new ProprietarioRepository(concessionariaContext);
+            this.telefoneRepository = new TelefoneRepository(concessionariaContext);
         }
 
         [HttpGet]

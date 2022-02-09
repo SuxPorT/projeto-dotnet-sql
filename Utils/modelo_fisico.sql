@@ -9,7 +9,7 @@ GO
 
 CREATE TABLE [Proprietario] (
 	CpfCnpj VARCHAR(20) UNIQUE NOT NULL,
-	IndicadorPessoa CHAR(1) NOT NULL,
+	IndicadorPessoa VARCHAR(1) NOT NULL,
 	Nome VARCHAR(50) NOT NULL,
 	Email VARCHAR(50) NOT NULL,
 	DataNascimento DATETIME NOT NULL,

@@ -1,9 +1,19 @@
 # Projeto .NET e SQL
 
+[![VS Code Badge](https://img.shields.io/badge/Visual_Studio_Code-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white)](https://code.visualstudio.com/)
+[![Git Badge](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com/)
+[![CSharp Badge](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)](https://docs.microsoft.com/en-us/dotnet/csharp/)
+[![DotNet Badge](https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://docs.microsoft.com/en-us/dotnet/)
+[![Microsoft SQL Server Badge](https://img.shields.io/badge/Microsoft_SQL_Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)](https://www.microsoft.com/en-us/sql-server)
+[![Trello Badge](https://img.shields.io/badge/Trello-0052CC?style=for-the-badge&logo=trello&logoColor=white)](https://trello.com/en)
+[<img src="https://static1.smartbear.co/swagger/media/assets/images/swagger_logo.svg" width="90px;"></img>](https://swagger.io/)
+
 Projeto realizado durante a disciplina de Desenvolvimento em Aplicações, em
 parceria com a PUCPR e a Volvo.
 
-Link do Trello: https://trello.com/b/sJCcWqNi/projeto-net-e-sql
+Link do Trello utilizado: https://trello.com/b/sJCcWqNi/projeto-net-e-sql
+
+---
 
 ## Descrição do problema
 
